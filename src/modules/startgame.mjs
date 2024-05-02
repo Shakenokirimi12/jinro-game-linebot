@@ -1,12 +1,6 @@
 
 export async function startGame(data, request, env, BOT_URL) {
     var origintype = data.events[0].source.type;
-    if (origintype == "group") {
-        var groupId = data.events[0].source.groupId;
-    }
-    else {
-        return [{ "type": "text", "text": "個人チャットからルームを開始することはできません... \r\n グループから開始操作を行なってください...." }];
-    }
     //ルームコード生成
     var S = "0123456789"
     var N = 6
@@ -17,19 +11,19 @@ export async function startGame(data, request, env, BOT_URL) {
     var currentTime = String(Math.floor((new Date()).getTime() / 1e3)); //unixtime
     try {
         if (origintype == "group") {
+            var groupId = data.events[0].source.groupId;
             const { results: searchByUserId } = await env.D1_DATABASE.prepare(
                 "SELECT * FROM Rooms WHERE created_User_Id = ?"
             ).bind(queried_User_Id).run();
             if (searchByUserId.length == 0) {
-                await env.D1_DATABASE.prepare(
-                    "INSERT INTO Rooms VALUES ( ? , ? , ? , ? , ? , ? , ?, ?)"
-                ).bind(room_Code, queried_User_Id, null, currentTime, null, 1, "initialized", groupId).run();
-
                 const { results: searchByGroupId } = await env.D1_DATABASE.prepare(
                     "SELECT * FROM Rooms WHERE groupId = ?"
                 ).bind(groupId).all();
-
                 if (searchByGroupId.length == 0) {
+                    await env.D1_DATABASE.prepare(
+                        "INSERT INTO Rooms VALUES ( ? , ? , ? , ? , ? , ? , ?, ?)"
+                    ).bind(room_Code, queried_User_Id, null, currentTime, null, 1, "initialized", groupId).run();
+
                     await env.D1_DATABASE.prepare(
                         "INSERT INTO ConnectedUsers VALUES ( ? , ? , ?, ? , ? )"
                     ).bind(room_Code, queried_User_Id, currentTime, "connected", null).run();
@@ -42,6 +36,9 @@ export async function startGame(data, request, env, BOT_URL) {
             else {
                 return [{ "type": "text", "text": "すでにゲームを開始しています。 \r\n あなたのルームコードは" }, { "type": "text", "text": searchByUserId[0].room_Code }, { "type": "text", "text": "です。" }, { "type": "text", "text": "新しいゲームを開始したい場合は、現在のゲームを終了させる必要があります。  \r\n 終了するには、/jinro endと送信してください。" }]
             }
+        }
+        else {
+            return [{ "type": "text", "text": "個人チャットからルームを開始することはできません... \r\n グループから開始操作を行なってください...."}];
         }
     }
     catch (error) {

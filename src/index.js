@@ -2,6 +2,7 @@ import { startGame } from "./modules/startgame.mjs";
 import { endGame } from "./modules/endgame.mjs";
 import { connectRoom } from "./modules/connectRoom.mjs";
 import { disconRoom } from "./modules/disconRoom.mjs";
+import { contToNext } from "./modules/continueToNext.mjs";
 
 const BOT_URL = "https://lin.ee/H6oMBxr"
 
