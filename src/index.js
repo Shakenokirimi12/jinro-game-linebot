@@ -1,6 +1,8 @@
 import { startGame } from "./modules/startgame.mjs";
 import { endGame } from "./modules/endgame.mjs";
 import { connectRoom } from "./modules/connectRoom.mjs";
+import { disconRoom } from "./modules/disconRoom.mjs";
+
 const BOT_URL = "https://lin.ee/H6oMBxr"
 
 const url = "https://api.line.me/v2/bot/message/reply"
@@ -32,6 +34,9 @@ async function readRequestBody(request, env) {
       }
       else if (prompt == "/jinro next") {
         resmessage = await contToNext(data, request, env)
+      }
+      else if (prompt == "/jinro discon") {
+        resmessage = await disconRoom(data, request, env)
       }
       else if (prompt.match(/\/jinro connect \d{6}/)) {
         resmessage = await connectRoom(data, request, env)
