@@ -1,3 +1,7 @@
+import { startGame } from "./modules/startgame.mjs";
+
+const BOT_URL = "https://lin.ee/H6oMBxr"
+
 const url = "https://api.line.me/v2/bot/message/reply"
 let LINE_ACCESS_TOKEN;
 function rawHtmlResponse(html) {
@@ -17,15 +21,14 @@ async function readRequestBody(request,env) {
     const data = await request.json()
 
     if (data.events[0]) {
-
+      var prompt = data.events[0].message;
+      var resultjson;
+      if(prompt == "/jinro start"){
+        var resultjson = await startGame(request,env);
+      }
       const body = {
         replyToken: data.events[0].replyToken,
-        messages: [
-          {
-             type: "text",
-             text: resulttext
-          }
-        ]
+        messages: resultjson
       }
       const init = {
         body: JSON.stringify(body),
