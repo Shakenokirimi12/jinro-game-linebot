@@ -4,9 +4,10 @@ export async function startGame(request, env, BOT_URL) {
     var S = "0123456789"
     var N = 6
     var room_Code = Array.from(Array(N)).map(() => S[Math.floor(Math.random() * S.length)]).join('')
-    console.log(room_Code);
+    console.log("Room code is :" + room_Code);
     //ルームコード生成
-    var host_user_id = request.events[0].source.userId;
+    const data = await request.json()
+    var host_user_id = data.events[0].source.userId;
     var currentTime = String(Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3));
     //Roomsテーブルのカラムは、順に　ルームコード、作った人のユーザーId、ルームタイプコード、開始時刻、議論開始時刻、参加者数、設定状態
     await env.D1_DATABASE.prepare(
@@ -42,4 +43,5 @@ export async function startGame(request, env, BOT_URL) {
             "text": "全員の参加が完了したら、このグループで、 /jinro next を送ってください。"
         }
     ]
+    return resultjson;
 }

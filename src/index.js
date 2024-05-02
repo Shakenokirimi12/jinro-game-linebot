@@ -3,7 +3,6 @@ import { startGame } from "./modules/startgame.mjs";
 const BOT_URL = "https://lin.ee/H6oMBxr"
 
 const url = "https://api.line.me/v2/bot/message/reply"
-let LINE_ACCESS_TOKEN;
 function rawHtmlResponse(html) {
   const init = {
     headers: {
@@ -13,7 +12,7 @@ function rawHtmlResponse(html) {
   return new Response(html, init)
 }
 
-async function readRequestBody(request,env) {
+async function readRequestBody(request, env) {
   const { headers } = request
   const contentType = headers.get("content-type") || ""
 
@@ -21,10 +20,11 @@ async function readRequestBody(request,env) {
     const data = await request.json()
 
     if (data.events[0]) {
-      var prompt = data.events[0].message;
+      var prompt = data.events[0].message.text;
+      console.log(prompt)
       var resultjson;
-      if(prompt == "/jinro start"){
-        var resultjson = await startGame(request,env);
+      if (prompt == "/jinro start") {
+        var resultjson = await startGame(request, env);
       }
       const body = {
         replyToken: data.events[0].replyToken,
@@ -34,9 +34,9 @@ async function readRequestBody(request,env) {
         body: JSON.stringify(body),
         method: "POST",
         headers: {
-          Authorization: "Bearer " + LINE_ACCESS_TOKEN,
+          Authorization: "Bearer " + env.ACCESS_TOKEN,
           "content-type": "application/json"
-          }
+        }
       }
       const res = await fetch(url, init)
 
@@ -68,25 +68,24 @@ async function readRequestBody(request,env) {
   }
 }
 
-async function handleRequest(request,env) {
-  const reqBody = await readRequestBody(request,env)
+async function handleRequest(request, env) {
+  const reqBody = await readRequestBody(request, env)
   const retBody = `The request body sent in was ${reqBody}`
-  //console.log(reqBody)
+  console.log(reqBody)
   return new Response(retBody);
 }
 
 
 export default {
-	async fetch(request, env, ctx) {
-		const { url } = request
-		LINE_ACCESS_TOKEN = env.ACCESS_TOKEN;
-		console.log(JSON.stringify(request))
-	  
-		if (request.method === "POST") {
-		  return handleRequest(request,env)
-		}
-		else if (request.method === "GET") {
-		  return new Response(`The request was a GET`)
-		}
-	}
+  async fetch(request, env, ctx) {
+    const { url } = request
+    console.log(JSON.stringify(request))
+
+    if (request.method === "POST") {
+      return handleRequest(request, env)
+    }
+    else if (request.method === "GET") {
+      return new Response(`The request was a GET`)
+    }
+  }
 }
