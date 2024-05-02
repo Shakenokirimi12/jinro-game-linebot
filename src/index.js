@@ -1,5 +1,6 @@
 import { startGame } from "./modules/startgame.mjs";
-
+import { endGame } from "./modules/endgame.mjs";
+import { connectRoom } from "./modules/connectRoom.mjs";
 const BOT_URL = "https://lin.ee/H6oMBxr"
 
 const url = "https://api.line.me/v2/bot/message/reply"
@@ -22,25 +23,47 @@ async function readRequestBody(request, env) {
     if (data.events[0]) {
       var prompt = data.events[0].message.text;
       console.log(prompt)
-      var resultjson;
+      let resmessage;
       if (prompt == "/jinro start") {
-        var resultjson = await startGame(request, env);
+        resmessage = await startGame(data, request, env, BOT_URL)
       }
-      const body = {
-        replyToken: data.events[0].replyToken,
-        messages: resultjson
+      else if (prompt == "/jinro end") {
+        resmessage = await endGame(data, request, env)
+      }
+      else if (prompt == "/jinro next") {
+        resmessage = await contToNext(data, request, env)
+      }
+      else if (prompt.match(/\/jinro connect \d{6}/)) {
+        resmessage = await connectRoom(data, request, env)
+      }
+      else if (prompt == "/jinro help"){
+        resmessage = [
+          {
+            "type": "text",
+            "text": "ゲームを始めるには \r\n /jinro start \r\n ゲームを終了するには \r\n　/jinro end \r\n ルームに接続するには \r\n /jinro connect 000000 \r\n (000000はルームコードに置き換えてください)"
+          }]
+      }
+      else if (prompt.includes("/jinro")){
+        resmessage = [
+          {
+            "type": "text",
+            "text": "コマンドが間違っています。タイプミスがないかご確認ください。"
+          }]
       }
       const init = {
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          replyToken: data.events[0].replyToken,
+          messages: resmessage
+        }),
         method: "POST",
         headers: {
           Authorization: "Bearer " + env.ACCESS_TOKEN,
           "content-type": "application/json"
         }
       }
+      console.log(init)
       const res = await fetch(url, init)
-
-      return JSON.stringify(data)
+      return JSON.stringify(res)
     }
     else {
       return JSON.stringify(data)
@@ -78,9 +101,6 @@ async function handleRequest(request, env) {
 
 export default {
   async fetch(request, env, ctx) {
-    const { url } = request
-    console.log(JSON.stringify(request))
-
     if (request.method === "POST") {
       return handleRequest(request, env)
     }
