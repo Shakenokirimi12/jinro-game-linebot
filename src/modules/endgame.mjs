@@ -14,6 +14,7 @@ export async function endGame(data, request, env) {
             //接続済みリストから削除
             "DELETE FROM ConnectedUsers WHERE room_Code = ?"
         ).bind(currentRoom[0].room_Code).run();
+        console.log(currentRoom)
         return [{ "type": "text", "text": "ゲームを終了しました。" }];
     }
     catch (error) {
