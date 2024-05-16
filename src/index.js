@@ -3,6 +3,7 @@ import { endGame } from "./modules/endgame.mjs";
 import { connectRoom } from "./modules/connectRoom.mjs";
 import { disconRoom } from "./modules/disconRoom.mjs";
 import { contToNext } from "./modules/continueToNext.mjs";
+import { ruleListBuilder } from "./modules/ruleListBuilder.mjs";
 
 const BOT_URL = "https://lin.ee/H6oMBxr"
 
@@ -34,6 +35,7 @@ async function readRequestBody(request, env) {
         resmessage = await endGame(data, request, env)
       }
       else if (prompt == "/jinro next") {
+        resmessage = await ruleListBuilder(data, request, env, 4)
         resmessage = await contToNext(data, request, env)
       }
       else if (prompt == "/jinro discon") {
@@ -42,14 +44,14 @@ async function readRequestBody(request, env) {
       else if (prompt.match(/\/jinro connect \d{6}/)) {
         resmessage = await connectRoom(data, request, env)
       }
-      else if (prompt == "/jinro help"){
+      else if (prompt == "/jinro help") {
         resmessage = [
           {
             "type": "text",
             "text": "ゲームを始めるには \r\n /jinro start \r\n ゲームを終了するには \r\n　/jinro end \r\n ルームに接続するには \r\n /jinro connect 000000 \r\n (000000はルームコードに置き換えてください)"
           }]
       }
-      else if (prompt.includes("/jinro")){
+      else if (prompt.includes("/jinro")) {
         resmessage = [
           {
             "type": "text",
@@ -67,7 +69,6 @@ async function readRequestBody(request, env) {
           "content-type": "application/json"
         }
       }
-      console.log(init)
       const res = await fetch(url, init)
       return JSON.stringify(res)
     }

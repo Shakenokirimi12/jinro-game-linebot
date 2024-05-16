@@ -1,3 +1,4 @@
+import { ruleListBuilder } from "./ruleListBuilder.mjs";
 export async function contToNext(data, request, env) {
     var queried_User_Id = data.events[0].source.userId;
     const { results: connectedRoom } = await env.D1_DATABASE.prepare(
@@ -10,7 +11,7 @@ export async function contToNext(data, request, env) {
         var currentStatus = currentRoom[0].status;
         console.log(currentStatus)
         if (currentStatus == "initialized") {
-            return [{ "type": "text", "text": "どのモードで遊ぶか選んでください。" }]
+            return await ruleListBuilder(data, request, env, currentRoom[0].connection_Count);
         }
     }
     else {
