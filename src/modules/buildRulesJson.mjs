@@ -1,7 +1,8 @@
 export async function buildRulesJson(ruleName, citizen, werewolf, diviner, spiritist, knight, madman, fox, ruleId) {
+  let actiontext = "/jinro rule " + ruleId;
   let DefaultRule = {
     "type": "bubble",
-    "size": "micro",
+    "size": "deca",
     "body": {
       "type": "box",
       "layout": "vertical",
@@ -188,7 +189,7 @@ export async function buildRulesJson(ruleName, citizen, werewolf, diviner, spiri
           "action": {
             "type": "message",
             "label": "これにする",
-            "text": "/jinro rule " + ruleId
+            "text": actiontext
           }
         }
       ],
