@@ -1,40 +1,37 @@
 import { buildRulesJson } from "./buildRulesJson.mjs";
 
 export async function ruleListBuilder(data, request, env, playercount) {
-    playercount = 4;
-    const { results: rules } = await env.D1_DATABASE.prepare(
+    const { results: ruleDatas } = await env.D1_DATABASE.prepare(
         "SELECT * FROM Rules WHERE Players = ?"
-    ).bind(playercount).all();
-    let rulebubbles = await buildRulesJson(rules);
-    /*
-    let returnJson = [
-        {
-            "type": "carousel",
-            "contents": rulebubbles
-        }
-    ]
-    */
-    let returnJson = [{
-        "type": "carousel",
-        "contents": [
-            {
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": []
-                }
-            },
-            {
-                "type": "bubble",
-                "body": {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": []
-                }
+    ).bind(Number(playercount)).all();
+    let n = 0;
+    let rulebubblearray = [];
+    while (true) {
+        try {
+            let ruleName = ruleDatas[n].ruleName;
+            let citizen = ruleDatas[n].citizen;
+            let werewolf = ruleDatas[n].werewolf;
+            let diviner = ruleDatas[n].diviner;
+            let spiritist = ruleDatas[n].knight;
+            let knight = ruleDatas[n].knight;
+            let madman = ruleDatas[n].madman;
+            let fox = ruleDatas[n].fox;
+            let ruleId = ruleDatas[n].ruleId;
+            if (ruleName != undefined || ruleName != null || ruleName != "") {
+                let rulebubble = await buildRulesJson(ruleName, citizen, werewolf, diviner, spiritist, knight, madman, fox, ruleId);
+                rulebubblearray = rulebubblearray.push(rulebubble)
+                n++;
             }
-        ]
-    }]
+        }
+        catch (error) {
+            break;
+        }
+    }
+    let returnJson =
+    {
+        "type": "carousel",
+        "contents": rulebubblearray
+    }
     console.log(returnJson)
     return returnJson;
 }

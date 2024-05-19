@@ -1,14 +1,4 @@
-export async function buildRulesJson(ruleData) {
-  let ruleName, citizen, werewolf, diviner, spiritist, knight, madman, fox, ruleId;
-  ruleName = ruleData[0].ruleName;
-  citizen = ruleData[0].citizen;
-  werewolf = ruleData[0].werewolf;
-  diviner = ruleData[0].diviner;
-  spiritist = ruleData[0].knight;
-  knight = ruleData[0].knight;
-  madman = ruleData[0].madman;
-  fox = ruleData[0].fox;
-  ruleId = ruleData[0].ruleId;
+export async function buildRulesJson(ruleName, citizen, werewolf, diviner, spiritist, knight, madman, fox, ruleId) {
   let DefaultRule = {
     "type": "bubble",
     "size": "micro",
