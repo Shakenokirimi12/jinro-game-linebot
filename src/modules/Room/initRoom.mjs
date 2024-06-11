@@ -1,5 +1,5 @@
 
-export async function startGame(data, request, env, BOT_URL) {
+export async function initRoom(data, request, env, BOT_URL) {
     var origintype = data.events[0].source.type;
     //ルームコード生成
     var S = "0123456789"

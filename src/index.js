@@ -1,9 +1,13 @@
-import { startGame } from "./modules/startgame.mjs";
-import { endGame } from "./modules/endgame.mjs";
-import { connectRoom } from "./modules/connectRoom.mjs";
-import { disconRoom } from "./modules/disconRoom.mjs";
-import { contToNext } from "./modules/continueToNext.mjs";
-import { ruleListBuilder } from "./modules/ruleListBuilder.mjs";
+import { initRoom } from "./modules/Room/initRoom.mjs";
+import { closeRoom } from "./modules/Room/closeRoom.mjs";
+import { connectRoom } from "./modules/Room/connectRoom.mjs";
+import { disconRoom } from "./modules/Room/disconRoom.mjs";
+import { ruleListBuilder } from "./modules/builders/ruleListBuilder.mjs";
+import { applyRule } from "./modules/Room/applyRule.mjs";
+import { startGame } from "./modules/Game/startGame.mjs";
+import { decideRole } from "./modules/Game/RoleSetter.mjs";
+import { showRole } from "./modules/Game/RoleSetter.mjs";
+
 
 const BOT_URL = "https://lin.ee/H6oMBxr"
 
@@ -20,44 +24,55 @@ function rawHtmlResponse(html) {
 async function readRequestBody(request, env) {
   const { headers } = request
   const contentType = headers.get("content-type") || ""
-
   if (contentType.includes("application/json")) {
     const data = await request.json()
-
     if (data.events[0]) {
       var prompt = data.events[0].message.text;
       console.log(prompt)
       let resmessage;
-      if (prompt == "/jinro start") {
-        resmessage = await startGame(data, request, env, BOT_URL)
+      switch (prompt) {
+        case "/jinro init":
+          resmessage = await initRoom(data, request, env, BOT_URL);
+          break;
+        case "/jinro close":
+          resmessage = await closeRoom(data, request, env);
+          break;
+        case "/jinro rule select":
+          resmessage = await ruleListBuilder(data, request, env);
+          break;
+        case "/jinro discon":
+          resmessage = await disconRoom(data, request, env);
+          break;
+        case "/jinro game start":
+          resmessage = await startGame(data, request, env);
+          break;
+        case "/jinro button rolecheck":
+          resmessage = await showRole(data, request, env);
+          break;
+        case "/jinro help":
+          resmessage = [
+            {
+              "type": "text",
+              "text": "ゲームを始めるには \r\n /jinro init \r\n ゲームを終了するには \r\n　/jinro close \r\n ルームに接続するには \r\n /jinro connect 000000 \r\n (000000はルームコードに置き換えてください)"
+            }
+          ];
+          break;
+        default:
+          if (prompt.match(/\/jinro connect \d{6}/)) {
+            resmessage = await connectRoom(data, request, env)
+          }
+          else if (prompt.match(/\/jinro rule \d{7}/)) {
+            resmessage = await applyRule(data, request, env)
+          }
+          else if (prompt.includes("/jinro")) {
+            resmessage = [
+              {
+                "type": "text",
+                "text": "コマンドが間違っています。タイプミスがないかご確認ください。"
+              }]
+          }
       }
-      else if (prompt == "/jinro end") {
-        resmessage = await endGame(data, request, env)
-      }
-      else if (prompt == "/jinro next") {
-        resmessage = await ruleListBuilder(data, request, env, 4)
-        resmessage = await contToNext(data, request, env)
-      }
-      else if (prompt == "/jinro discon") {
-        resmessage = await disconRoom(data, request, env)
-      }
-      else if (prompt.match(/\/jinro connect \d{6}/)) {
-        resmessage = await connectRoom(data, request, env)
-      }
-      else if (prompt == "/jinro help") {
-        resmessage = [
-          {
-            "type": "text",
-            "text": "ゲームを始めるには \r\n /jinro start \r\n ゲームを終了するには \r\n　/jinro end \r\n ルームに接続するには \r\n /jinro connect 000000 \r\n (000000はルームコードに置き換えてください)"
-          }]
-      }
-      else if (prompt.includes("/jinro")) {
-        resmessage = [
-          {
-            "type": "text",
-            "text": "コマンドが間違っています。タイプミスがないかご確認ください。"
-          }]
-      }
+
       const init = {
         body: JSON.stringify({
           replyToken: data.events[0].replyToken,

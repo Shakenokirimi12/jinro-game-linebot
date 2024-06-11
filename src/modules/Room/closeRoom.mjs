@@ -1,5 +1,5 @@
 
-export async function endGame(data, request, env) {
+export async function closeRoom(data, request, env) {
     var origintype = data.events[0].source.type;
     if (origintype == "group") {
         var groupId = data.events[0].source.groupId;
@@ -10,7 +10,6 @@ export async function endGame(data, request, env) {
     var host_user_id = data.events[0].source.userId;
     try {
         const { results: currentRoom } = await env.D1_DATABASE.prepare(
-            //生徒の答え一覧を取得
             "SELECT * FROM Rooms WHERE created_User_Id = ?"
         ).bind(host_user_id).all();
         if (currentRoom.length == 0) {
