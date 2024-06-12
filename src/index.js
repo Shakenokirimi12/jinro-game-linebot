@@ -7,6 +7,7 @@ import { applyRule } from "./modules/Room/applyRule.mjs";
 import { startGame } from "./modules/Game/startGame.mjs";
 import { decideRole } from "./modules/Game/RoleSetter.mjs";
 import { showRole } from "./modules/Game/RoleSetter.mjs";
+import { startDiscuss } from "./modules/Game/startDiscuss.mjs";
 
 
 const BOT_URL = "https://lin.ee/H6oMBxr"
@@ -49,6 +50,9 @@ async function readRequestBody(request, env) {
         case "/jinro button rolecheck":
           resmessage = await showRole(data, request, env);
           break;
+        case "/jinro discuss start":
+          resmessage = await startDiscuss(data, request, env, 100);
+          break;
         case "/jinro help":
           resmessage = [
             {
@@ -72,7 +76,7 @@ async function readRequestBody(request, env) {
               }]
           }
       }
-
+      console.log(JSON.stringify(resmessage))
       const init = {
         body: JSON.stringify({
           replyToken: data.events[0].replyToken,
@@ -84,7 +88,8 @@ async function readRequestBody(request, env) {
           "content-type": "application/json"
         }
       }
-      const res = await fetch(url, init)
+      const res = await fetch(url, init);
+      console.log(JSON.stringify(res))
       return JSON.stringify(res)
     }
     else {
@@ -116,7 +121,7 @@ async function readRequestBody(request, env) {
 async function handleRequest(request, env) {
   const reqBody = await readRequestBody(request, env)
   const retBody = `The request body sent in was ${reqBody}`
-  console.log(reqBody)
+  console.log(retBody)
   return new Response(retBody);
 }
 

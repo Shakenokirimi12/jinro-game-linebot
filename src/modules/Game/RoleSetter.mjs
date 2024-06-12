@@ -4,7 +4,7 @@ export async function decideRole(data, request, env) {
         var groupId = data.events[0].source.groupId;
     }
     else {
-        return [{ "type": "text", "text": "個人チャットからルームを終了することはできません... \r\n グループから終了操作を行なってください...." }];
+        return [{ "type": "t9ext", "text": "個人チャットからルームを終了することはできません... \r\n グループから終了操作を行なってください...." }];
     }
     var host_user_id = data.events[0].source.userId;
     try {
@@ -47,7 +47,7 @@ export async function showRole(data, request, env) {
                     "previewImageUrl": "https://jinro-resources.pages.dev/warewolf.PNG"
                 },
                 {
-                    "type": "text", "text": "あなたは最後に役職をみました。グループチャットに戻り、"
+                    "type": "text", "text": "あなたは最後に役職を見ました。グループチャットに戻り、"
                 },
                 {
                     "type": "text", "text": "/jinro discuss start"
