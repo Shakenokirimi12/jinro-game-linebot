@@ -2,6 +2,7 @@
 export async function disconRoom(data, request, env) {
     var queried_User_Id = data.events[0].source.userId;
     var prompt = data.events[0].message.text;
+    var userData = await getUserProfile(env, queried_User_Id);
     var currentTime = String(Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3));
     try {
         const { results: currentRoom } = await env.D1_DATABASE.prepare(
@@ -14,16 +15,39 @@ export async function disconRoom(data, request, env) {
             //ルームの接続数を1減らす=切断処理
             "UPDATE Rooms SET connection_Count = ? WHERE room_Code = ?"
         ).bind(Number(currentRoom[0].connection_Count) - 1, currentRoom[0].room_Code).run();
-        return [{ "type": "text", "text": "ルーム" + currentRoom[0].room_Code + "から切断しました。" }];
+        if (userData.displayName == undefined) {
+            return [{ "type": "text", "text": "ゲストさんがルーム" + currentRoom[0].room_Code + "から切断しました。" }];
+        }
+        else {
+            return [{ "type": "text", "text": userData.displayName + "さんがルーム" + currentRoom[0].room_Code + "から切断しました。" }];
+        }
     }
     catch (error) {
         console.log(error);
-        if(String(error).includes("consistraint")){
+        if (String(error).includes("consistraint")) {
             return [{ "type": "text", "text": "どのルームにも接続されていません。" }];
         }
-        else{
+        else {
             return [{ "type": "text", "text": "サーバーでエラーが発生しました。" + error }];
         }
     }
 
+}
+
+
+async function getUserProfile(env, userId) {
+    let request_url = `https://api.line.me/v2/bot/profile/${userId}`;
+    let returnData = await fetch(request_url, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            Authorization: `Bearer ${env.ACCESS_TOKEN}`,
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            return data;
+        });
+
+    return returnData;
 }

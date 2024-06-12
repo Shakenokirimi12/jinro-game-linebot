@@ -63,7 +63,7 @@ async function readRequestBody(request, env) {
           break;
         default:
           if (prompt.match(/\/jinro connect \d{6}/)) {
-            resmessage = await connectRoom(data, request, env)
+            resmessage = await connectRoom(data, request, env, BOT_URL)
           }
           else if (prompt.match(/\/jinro rule \d{7}/)) {
             resmessage = await applyRule(data, request, env)
