@@ -1,20 +1,20 @@
 
 export async function initRoom(data, request, env, BOT_URL) {
-    var origintype = data.events[0].source.type;
+    let origintype = data.events[0].source.type;
     //ルームコード生成
-    var S = "0123456789"
-    var N = 6
-    var room_Code = Array.from(Array(N)).map(() => S[Math.floor(Math.random() * S.length)]).join('')
-    console.log("Room code is :" + room_Code);
+    let S = "0123456789"
+    let N = 6
+    let roomCode = Array.from(Array(N)).map(() => S[Math.floor(Math.random() * S.length)]).join('')
+    console.log("Room code is :" + roomCode);
     //ルームコード生成
-    var queried_User_Id = data.events[0].source.userId;
-    var currentTime = String(Math.floor((new Date()).getTime() / 1e3)); //unixtime
+    let queriedUserId = data.events[0].source.userId;
+    let currentTime = String(Math.floor((new Date()).getTime() / 1e3)); //unixtime
     try {
         if (origintype == "group") {
-            var groupId = data.events[0].source.groupId;
+            let groupId = data.events[0].source.groupId;
             const { results: searchByUserId } = await env.D1_DATABASE.prepare(
                 "SELECT * FROM Rooms WHERE created_User_Id = ?"
-            ).bind(queried_User_Id).run();
+            ).bind(queriedUserId).run();
             if (searchByUserId.length == 0) {
                 const { results: searchByGroupId } = await env.D1_DATABASE.prepare(
                     "SELECT * FROM Rooms WHERE groupId = ?"
@@ -22,12 +22,12 @@ export async function initRoom(data, request, env, BOT_URL) {
                 if (searchByGroupId.length == 0) {
                     await env.D1_DATABASE.prepare(
                         "INSERT INTO Rooms VALUES ( ? , ? , ? , ? , ? , ? , ?, ?)"
-                    ).bind(room_Code, queried_User_Id, null, currentTime, null, 1, "initialized", groupId).run();
+                    ).bind(roomCode, queriedUserId, null, currentTime, null, 1, "initialized", groupId).run();
 
                     await env.D1_DATABASE.prepare(
                         "INSERT INTO ConnectedUsers VALUES ( ? , ? , ?, ? , ? )"
-                    ).bind(room_Code, queried_User_Id, currentTime, "connected", null).run();
-                    return [{ "type": "text", "text": "ゲームを開始します。" + "\r\n" + "あなたのルームコードは" }, { "type": "text", "text": room_Code }, { "type": "text", "text": "です。" }, { "type": "text", "text": "参加する方は、このアカウントと友達になり、ルームコードを送信してください。" + "\r\n" + "全員の参加が完了したら、このグループで、 /jinro next を送ってください。" + "\r\n" + BOT_URL },];
+                    ).bind(roomCode, queriedUserId, currentTime, "connected", null).run();
+                    return [{ "type": "text", "text": "ゲームを開始します。" + "\r\n" + "あなたのルームコードは" }, { "type": "text", "text": roomCode }, { "type": "text", "text": "です。" }, { "type": "text", "text": "参加する方は、このアカウントと友達になり、ルームコードを送信してください。" + "\r\n" + "全員の参加が完了したら、このグループで、 /jinro next を送ってください。" + "\r\n" + BOT_URL },];
                 }
                 else {
                     return [{ "type": "text", "text": "グループ内の誰かがゲームをすでに始めています。\r\n ルームコードは" }, { "type": "text", "text": searchByGroupId[0].room_Code }, { "type": "text", "text": "です。" }];

@@ -1,15 +1,15 @@
 import { ruleFlexBuilder } from "./ruleFlexBuilder.mjs";
 
 export async function ruleListBuilder(data, request, env) {
-    var queried_User_Id = data.events[0].source.userId;
+    let queriedUserId = data.events[0].source.userId;
     const { results: connectedRoom } = await env.D1_DATABASE.prepare(
         "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
-    ).bind(queried_User_Id).all();
+    ).bind(queriedUserId).all();
     if (connectedRoom.length != 0) {
         const { results: currentRoom } = await env.D1_DATABASE.prepare(
             "SELECT * FROM Rooms WHERE room_Code = ?"
         ).bind(connectedRoom[0].room_Code).all();
-        var currentStatus = currentRoom[0].status;
+        let currentStatus = currentRoom[0].status;
         console.log(currentStatus)
         if (currentStatus == "initialized") {
             const { results: ruleDatas } = await env.D1_DATABASE.prepare(

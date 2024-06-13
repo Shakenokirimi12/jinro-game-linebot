@@ -1,19 +1,19 @@
 
 export async function disconRoom(data, request, env) {
-    var queried_User_Id = data.events[0].source.userId;
-    var prompt = data.events[0].message.text;
-    var userData = await getUserProfile(env, queried_User_Id);
-    var currentTime = String(Math.floor((new Date()).getTime() / 1e3));
+    let queriedUserId = data.events[0].source.userId;
+    let prompt = data.events[0].message.text;
+    let userData = await getUserProfile(env, queriedUserId);
+    let currentTime = String(Math.floor((new Date()).getTime() / 1e3));
     try {
         const { results: currentRoom } = await env.D1_DATABASE.prepare(
             "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
-        ).bind(queried_User_Id).all();
+        ).bind(queriedUserId).all();
         const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM Rooms WHERE room_Code = ?"
         ).bind(currentRoom[0].room_Code).all();
         await env.D1_DATABASE.prepare(
             "DELETE FROM ConnectedUsers WHERE connected_User_Id = ?"
-        ).bind(queried_User_Id).run();
+        ).bind(queriedUserId).run();
         await env.D1_DATABASE.prepare(
             //ルームの接続数を1減らす=切断処理
             "UPDATE Rooms SET connection_Count = ? WHERE room_Code = ?"
@@ -39,8 +39,8 @@ export async function disconRoom(data, request, env) {
 
 
 async function getUserProfile(env, userId) {
-    let request_url = `https://api.line.me/v2/bot/profile/${userId}`;
-    let returnData = await fetch(request_url, {
+    let requestUrl = `https://api.line.me/v2/bot/profile/${userId}`;
+    let returnData = await fetch(requestUrl, {
         method: "GET",
         headers: {
             "Content-Type": "application/json; charset=UTF-8",

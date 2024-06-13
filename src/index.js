@@ -30,7 +30,7 @@ async function readRequestBody(request, env) {
   if (contentType.includes("application/json")) {
     const data = await request.json()
     if (data.events[0]) {
-      var prompt = data.events[0].message.text;
+      let prompt = data.events[0].message.text;
       console.log(prompt)
       let resmessage;
       switch (prompt) {
@@ -53,7 +53,7 @@ async function readRequestBody(request, env) {
           resmessage = await showRole(data, request, env);
           break;
         case "/jinro discuss start":
-          resmessage = await startDiscuss(data, request, env, 100);
+          resmessage = await startDiscuss(data, request, env, 600);
           break;
         case "/jinro timeup":
           resmessage = await startElection(data, request, env);
