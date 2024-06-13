@@ -8,10 +8,10 @@ export async function connectRoom(data, request, env, BOT_URL) {
     const room_Code = prompt.match(/\/jinro connect (\d{6})/)[1];
     console.log("6桁の数字:", room_Code);
     var currentTime = String(Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3));
-    const { results: connectDestination } = await env.D1_DATABASE.prepare(
+    const { results: userConnectStatus } = await env.D1_DATABASE.prepare(
         "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
     ).bind(queried_User_Id).all();
-    if (connectDestination.length == 0) {
+    if (userConnectStatus.length == 0) {
         await env.D1_DATABASE.prepare(
             "INSERT INTO ConnectedUsers VALUES ( ? , ? , ?, ? , ? )"
         ).bind(room_Code, queried_User_Id, currentTime, "connected", null).run();
@@ -20,12 +20,16 @@ export async function connectRoom(data, request, env, BOT_URL) {
             "SELECT * FROM Rooms WHERE room_Code = ?"
         ).bind(room_Code).all();
 
+        if (connectDestination.length == 0) {
+            return [{ "type": "text", "text": "指定したルームが存在しません。" }];
+        }
+
         if (connectDestination[0].status == "initialized") {
             await env.D1_DATABASE.prepare(
                 //ルームの接続数を1増やす=接続処理
                 "UPDATE Rooms SET connection_Count = ? WHERE room_Code = ?"
             ).bind(Number(connectDestination[0].connection_Count) + 1, room_Code).run();
-            console.log(connected_User_Id);
+
             if (userData.displayName == undefined) {
                 return [{ "type": "text", "text": "ゲストさんがルーム" + room_Code + "に参加しました。" }, { "type": "text", "text": "ゲームを続行するためには、このアカウントとの友達登録が必要です。" }, { "type": "text", "text": BOT_URL }];
             }

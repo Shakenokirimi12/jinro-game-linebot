@@ -8,6 +8,8 @@ import { startGame } from "./modules/Game/startGame.mjs";
 import { decideRole } from "./modules/Game/RoleSetter.mjs";
 import { showRole } from "./modules/Game/RoleSetter.mjs";
 import { startDiscuss } from "./modules/Game/startDiscuss.mjs";
+import { startElection } from "./modules/Game/electionOperator.mjs";
+import { handleMention } from "./modules/Game/electionOperator.mjs";
 
 
 const BOT_URL = "https://lin.ee/H6oMBxr"
@@ -53,6 +55,9 @@ async function readRequestBody(request, env) {
         case "/jinro discuss start":
           resmessage = await startDiscuss(data, request, env, 100);
           break;
+        case "/jinro timeup":
+          resmessage = await startElection(data, request, env);
+          break;
         case "/jinro help":
           resmessage = [
             {
@@ -67,6 +72,9 @@ async function readRequestBody(request, env) {
           }
           else if (prompt.match(/\/jinro rule \d{7}/)) {
             resmessage = await applyRule(data, request, env)
+          }
+          else if (prompt.includes("@")) {
+            resmessage = await handleMention(data, request, env)
           }
           else if (prompt.includes("/jinro")) {
             resmessage = [

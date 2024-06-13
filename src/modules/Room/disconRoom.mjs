@@ -3,18 +3,21 @@ export async function disconRoom(data, request, env) {
     var queried_User_Id = data.events[0].source.userId;
     var prompt = data.events[0].message.text;
     var userData = await getUserProfile(env, queried_User_Id);
-    var currentTime = String(Math.floor((/* @__PURE__ */ new Date()).getTime() / 1e3));
+    var currentTime = String(Math.floor((new Date()).getTime() / 1e3));
     try {
         const { results: currentRoom } = await env.D1_DATABASE.prepare(
             "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
         ).bind(queried_User_Id).all();
+        const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
+            "SELECT * FROM Rooms WHERE room_Code = ?"
+        ).bind(currentRoom[0].room_Code).all();
         await env.D1_DATABASE.prepare(
             "DELETE FROM ConnectedUsers WHERE connected_User_Id = ?"
         ).bind(queried_User_Id).run();
         await env.D1_DATABASE.prepare(
             //ルームの接続数を1減らす=切断処理
             "UPDATE Rooms SET connection_Count = ? WHERE room_Code = ?"
-        ).bind(Number(currentRoom[0].connection_Count) - 1, currentRoom[0].room_Code).run();
+        ).bind(Number(currentRoomInfo[0].connection_Count) - 1, currentRoom[0].room_Code).run();
         if (userData.displayName == undefined) {
             return [{ "type": "text", "text": "ゲストさんがルーム" + currentRoom[0].room_Code + "から切断しました。" }];
         }
