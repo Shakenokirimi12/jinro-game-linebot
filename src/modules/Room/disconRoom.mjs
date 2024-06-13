@@ -5,24 +5,24 @@ export async function disconRoom(data, request, env) {
     let userData = await getUserProfile(env, queriedUserId);
     let currentTime = String(Math.floor((new Date()).getTime() / 1e3));
     try {
-        const { results: currentRoom } = await env.D1_DATABASE.prepare(
+        const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
         ).bind(queriedUserId).all();
         const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM Rooms WHERE room_Code = ?"
-        ).bind(currentRoom[0].room_Code).all();
+        ).bind(queriedUserInfo[0].room_Code).all();
         await env.D1_DATABASE.prepare(
             "DELETE FROM ConnectedUsers WHERE connected_User_Id = ?"
         ).bind(queriedUserId).run();
         await env.D1_DATABASE.prepare(
             //ルームの接続数を1減らす=切断処理
             "UPDATE Rooms SET connection_Count = ? WHERE room_Code = ?"
-        ).bind(Number(currentRoomInfo[0].connection_Count) - 1, currentRoom[0].room_Code).run();
+        ).bind(Number(currentRoomInfo[0].connection_Count) - 1, queriedUserInfo[0].room_Code).run();
         if (userData.displayName == undefined) {
-            return [{ "type": "text", "text": "ゲストさんがルーム" + currentRoom[0].room_Code + "から切断しました。" }];
+            return [{ "type": "text", "text": "ゲストさんがルーム" + queriedUserInfo[0].room_Code + "から切断しました。" }];
         }
         else {
-            return [{ "type": "text", "text": userData.displayName + "さんがルーム" + currentRoom[0].room_Code + "から切断しました。" }];
+            return [{ "type": "text", "text": userData.displayName + "さんがルーム" + queriedUserInfo[0].room_Code + "から切断しました。" }];
         }
     }
     catch (error) {

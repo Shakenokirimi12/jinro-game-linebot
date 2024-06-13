@@ -2,7 +2,7 @@ import { initRoom } from "./modules/Room/initRoom.mjs";
 import { closeRoom } from "./modules/Room/closeRoom.mjs";
 import { connectRoom } from "./modules/Room/connectRoom.mjs";
 import { disconRoom } from "./modules/Room/disconRoom.mjs";
-import { ruleListBuilder } from "./modules/builders/ruleListBuilder.mjs";
+import { makeRulelist } from "./modules/Room/makeRuleList.mjs";
 import { applyRule } from "./modules/Room/applyRule.mjs";
 import { startGame } from "./modules/Game/startGame.mjs";
 import { decideRole } from "./modules/Game/RoleSetter.mjs";
@@ -41,7 +41,7 @@ async function readRequestBody(request, env) {
           resmessage = await closeRoom(data, request, env);
           break;
         case "/jinro rule select":
-          resmessage = await ruleListBuilder(data, request, env);
+          resmessage = await makeRulelist(data, request, env);
           break;
         case "/jinro discon":
           resmessage = await disconRoom(data, request, env);
@@ -53,7 +53,7 @@ async function readRequestBody(request, env) {
           resmessage = await showRole(data, request, env);
           break;
         case "/jinro discuss start":
-          resmessage = await startDiscuss(data, request, env, 600);
+          resmessage = await startDiscuss(data, request, env, 5);
           break;
         case "/jinro timeup":
           resmessage = await startElection(data, request, env);

@@ -2,12 +2,12 @@ export async function startElection(data, request, env) {
     let queriedUserId = data.events[0].source.userId;
     let origintype = data.events[0].source.type;
     if (origintype == "group") {
-        const { results: currentRoom } = await env.D1_DATABASE.prepare(
+        const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
         ).bind(queriedUserId).all();
         const { results: connectedUsers } = await env.D1_DATABASE.prepare(
             "SELECT * FROM ConnectedUsers WHERE room_Code = ? AND status = ?"
-        ).bind(currentRoom[0].room_Code, "alive").all();
+        ).bind(queriedUserInfo[0].room_Code, "alive").all();
 
         const displayNamesList = await getUserProfilesList(env, connectedUsers);
         console.log(displayNamesList); // 結果をコンソールに出力
@@ -59,32 +59,40 @@ async function getUserProfile(env, userId) {
 export async function handleMention(data, request, env) {
     try {
         let mentionees = data.events[0].message.mention.mentionees;
+        let prompt = data.events[0].message.text;
+        let queriedUserId = data.events[0].source.userId;
+        console.log(JSON.stringify(mentionees))
+        let mentionType = mentionees[0].type;
+        if (mentionees.length != 1 && mentionType != "user") {
+            return 0;
+        }
+        else {
+            // メンションの正規表現パターン
+            const mentionPattern = /^@(\w+)\s$/;
+            // メッセージがメンションのみかをチェック
+            if (mentionPattern.test(prompt)) {
+                let userData = await getUserProfile(env, queriedUserId);
+                let mentioneduserData = await getUserProfile(env, mentionees[0].userId);
+                const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
+                    "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
+                ).bind(queriedUserId).all();
+
+                const { results: ruleDatas } = await env.D1_DATABASE.prepare(
+                    "SELECT * FROM Rooms WHERE room_Code = ?"
+                ).bind(queriedUserInfo[0].room_Code).all();
+                
+
+                return [
+                    { "type": "text", "text": userData.displayName + "さんが" + mentioneduserData.displayName + "さんに投票しました。" },
+                ];
+            } else {
+                return 0;
+            }
+
+        }
     }
     catch (error) {
         console.log(error)
         return 0;
-    }
-    let prompt = data.events[0].message.text;
-    let queriedUserId = data.events[0].source.userId;
-    console.log(JSON.stringify(mentionees))
-    let mentionType = mentionees[0].type;
-    if (mentionees.length != 1 && mentionType != "user") {
-        return 0;
-    }
-    else {
-        // メンションの正規表現パターン
-        const mentionPattern = /^@(\w+)\s$/;
-
-        // メッセージがメンションのみかをチェック
-        if (mentionPattern.test(prompt)) {
-            let userData = await getUserProfile(env, queriedUserId);
-            let mentioneduserData = await getUserProfile(env, mentionees[0].userId);
-            return [
-                { "type": "text", "text": userData.displayName + "さんが" + mentioneduserData.displayName + "さんに投票しました。" },
-            ];
-        } else {
-            return 0;
-        }
-
     }
 }

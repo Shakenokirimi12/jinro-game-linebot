@@ -1,20 +1,20 @@
-import { ruleFlexBuilder } from "./ruleFlexBuilder.mjs";
+import { ruleFlexBuilder } from "../builders/ruleFlexBuilder.mjs";
 
-export async function ruleListBuilder(data, request, env) {
+export async function makeRulelist(data, request, env) {
     let queriedUserId = data.events[0].source.userId;
     const { results: connectedRoom } = await env.D1_DATABASE.prepare(
         "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
     ).bind(queriedUserId).all();
     if (connectedRoom.length != 0) {
-        const { results: currentRoom } = await env.D1_DATABASE.prepare(
+        const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM Rooms WHERE room_Code = ?"
         ).bind(connectedRoom[0].room_Code).all();
-        let currentStatus = currentRoom[0].status;
+        let currentStatus = currentRoomInfo[0].status;
         console.log(currentStatus)
         if (currentStatus == "initialized") {
             const { results: ruleDatas } = await env.D1_DATABASE.prepare(
                 "SELECT * FROM Rules WHERE Players = ?"
-            ).bind(Number(currentRoom[0].connection_Count)).all();
+            ).bind(Number(currentRoomInfo[0].connection_Count)).all();
             let n = 0;
             let rulebubblearray = [];
             while (true) {
@@ -44,14 +44,14 @@ export async function ruleListBuilder(data, request, env) {
             }
             else {
                 let rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8;
-                rule1 = currentRoom[0].connection_Count + '人用ルール①';
-                rule2 = currentRoom[0].connection_Count + '人用ルール②';
-                rule3 = currentRoom[0].connection_Count + '人用ルール③';
-                rule4 = currentRoom[0].connection_Count + '人用ルール④';
-                rule5 = currentRoom[0].connection_Count + '人用ルール⑤';
-                rule6 = currentRoom[0].connection_Count + '人用ルール⑥';
-                rule7 = currentRoom[0].connection_Count + '人用ルール⑦';
-                rule8 = currentRoom[0].connection_Count + '人用ルール⑧';
+                rule1 = currentRoomInfo[0].connection_Count + '人用ルール①';
+                rule2 = currentRoomInfo[0].connection_Count + '人用ルール②';
+                rule3 = currentRoomInfo[0].connection_Count + '人用ルール③';
+                rule4 = currentRoomInfo[0].connection_Count + '人用ルール④';
+                rule5 = currentRoomInfo[0].connection_Count + '人用ルール⑤';
+                rule6 = currentRoomInfo[0].connection_Count + '人用ルール⑥';
+                rule7 = currentRoomInfo[0].connection_Count + '人用ルール⑦';
+                rule8 = currentRoomInfo[0].connection_Count + '人用ルール⑧';
                 const orderMap = {
                     [rule1]: 1,
                     [rule2]: 2,

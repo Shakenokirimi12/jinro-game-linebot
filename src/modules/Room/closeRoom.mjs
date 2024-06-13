@@ -9,10 +9,10 @@ export async function closeRoom(data, request, env) {
     }
     let hostUserId = data.events[0].source.userId;
     try {
-        const { results: currentRoom } = await env.D1_DATABASE.prepare(
+        const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM Rooms WHERE created_User_Id = ?"
         ).bind(hostUserId).all();
-        if (currentRoom.length == 0) {
+        if (currentRoomInfo.length == 0) {
             return [{ "type": "text", "text": "どのルームにも参加していません。ルームに参加していないと、ルームを終了することができません。" }];
         }
         else {
@@ -21,8 +21,7 @@ export async function closeRoom(data, request, env) {
             ).bind(hostUserId).run();
             await env.D1_DATABASE.prepare(
                 "DELETE FROM ConnectedUsers WHERE room_Code = ?"
-            ).bind(currentRoom[0].room_Code).run();
-            console.log(currentRoom)
+            ).bind(currentRoomInfo[0].room_Code).run();
             return [{ "type": "text", "text": "ゲームを終了しました。" }];
         }
     }

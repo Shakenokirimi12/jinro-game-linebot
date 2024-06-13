@@ -8,10 +8,10 @@ export async function decideRole(data, request, env) {
     }
     let hostUserId = data.events[0].source.userId;
     try {
-        const { results: currentRoom } = await env.D1_DATABASE.prepare(
+        const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM Rooms WHERE created_User_Id = ?"
         ).bind(hostUserId).all();
-        if (currentRoom.length == 0) {
+        if (currentRoomInfo.length == 0) {
             return [{ "type": "text", "text": "どのルームにも参加していません。ルームに参加していないと、ゲームを開始することができません。" }];
         }
         else {
@@ -30,10 +30,10 @@ export async function showRole(data, request, env) {
     }
     let userId = data.events[0].source.userId;
     try {
-        const { results: currentRoom } = await env.D1_DATABASE.prepare(
+        const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM Rooms WHERE created_User_Id = ?"
         ).bind(userId).all();
-        if (currentRoom.length == 0) {
+        if (currentRoomInfo.length == 0) {
             return [{ "type": "text", "text": "どのルームにも参加していません。ルームに参加していないと、ゲームを開始することができません。" }];
         }
         else {
