@@ -5,7 +5,6 @@ import { disconRoom } from "./modules/Room/disconRoom.mjs";
 import { makeRulelist } from "./modules/Room/makeRuleList.mjs";
 import { applyRule } from "./modules/Room/applyRule.mjs";
 import { startGame } from "./modules/Game/startGame.mjs";
-import { decideRole } from "./modules/Game/RoleSetter.mjs";
 import { showRole } from "./modules/Game/RoleSetter.mjs";
 import { startDiscuss } from "./modules/Game/startDiscuss.mjs";
 import { startElection } from "./modules/Game/electionOperator.mjs";
@@ -49,7 +48,7 @@ async function readRequestBody(request, env) {
         case "/jinro game start":
           resmessage = await startGame(data, request, env);
           break;
-        case "/jinro button rolecheck":
+        case "/jinro role show":
           resmessage = await showRole(data, request, env);
           break;
         case "/jinro discuss start":

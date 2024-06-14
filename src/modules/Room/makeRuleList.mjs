@@ -39,10 +39,8 @@ export async function makeRulelist(data, request, env) {
                 }
             }
             let returnJson;
-            if (rulebubblearray.length == 0) {
-                returnJson = [{ "type": "text", "text": "この人数で遊ぶことのできるルールがありません。" }]
-            }
-            else {
+            console.log(rulebubblearray.length)
+            if (rulebubblearray.length != 0) {
                 let rule1, rule2, rule3, rule4, rule5, rule6, rule7, rule8;
                 rule1 = currentRoomInfo[0].connection_Count + '人用ルール①';
                 rule2 = currentRoomInfo[0].connection_Count + '人用ルール②';
@@ -83,6 +81,10 @@ export async function makeRulelist(data, request, env) {
                     }
                 ];
                 console.log(returnJson);
+                return returnJson;
+            }
+            else {
+                returnJson = [{ "type": "text", "text": "この人数で遊ぶことのできるルールがありません。" }]
                 return returnJson;
             }
         }
