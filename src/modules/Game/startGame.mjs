@@ -39,8 +39,8 @@ export async function startGame(data, request, env) {
                         "UPDATE ConnectedUsers SET role = ? WHERE connected_User_Id = ?"
                     ).bind(role, destinationUserId).run();
                     await env.D1_DATABASE.prepare(
-                        "UPDATE ConnectedUsers SET status = ? WHERE connected_User_Id = ?"
-                    ).bind("alive", destinationUserId).run();
+                        "UPDATE ConnectedUsers SET status = ? WHERE connected_User_Id = ? AND status = ?"
+                    ).bind("alive", destinationUserId, "connected").run();
                     currentRoomUsers.splice(pointer, 1);
                 }
             };
