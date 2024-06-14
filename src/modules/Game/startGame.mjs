@@ -1,3 +1,5 @@
+import { e } from "vitest/dist/reporters-QGe8gs4b.js";
+
 export async function startGame(data, request, env) {
     let origintype = data.events[0].source.type;
     if (origintype == "group") {
@@ -33,8 +35,67 @@ export async function startGame(data, request, env) {
             for (let i = 0; i <= citizen; i++) {
                 userCount = currentRoomUsers.length;
                 let pointer = Math.floor(Math.random() * (userCount + 1))
-                //あとは、役職ごとにforを回して、各ロールをアサイン。アサインした人は、currentRoomUsersから削除する。アサインするごとにDBアクセス。
+                var destinationUserId = currentRoomUsers[pointer].connected_User_Id;
+                await env.D1_DATABASE.prepare(
+                    "UPDATE ConnectedUsers SET role = ? WHERE connected_User_Id = ?"
+                ).bind("citizen", destinationUserId).run();
+                currentRoomUsers.splice(pointer - 1, 1);
             }
+            for (let i = 0; i <= werewolf; i++) {
+                userCount = currentRoomUsers.length;
+                let pointer = Math.floor(Math.random() * (userCount + 1))
+                var destinationUserId = currentRoomUsers[pointer].connected_User_Id;
+                await env.D1_DATABASE.prepare(
+                    "UPDATE ConnectedUsers SET role = ? WHERE connected_User_Id = ?"
+                ).bind("werewolf", destinationUserId).run();
+                currentRoomUsers.splice(pointer - 1, 1);
+            }
+            for (let i = 0; i <= diviner; i++) {
+                userCount = currentRoomUsers.length;
+                let pointer = Math.floor(Math.random() * (userCount + 1))
+                var destinationUserId = currentRoomUsers[pointer].connected_User_Id;
+                await env.D1_DATABASE.prepare(
+                    "UPDATE ConnectedUsers SET role = ? WHERE connected_User_Id = ?"
+                ).bind("diviner", destinationUserId).run();
+                currentRoomUsers.splice(pointer - 1, 1);
+            }
+            for (let i = 0; i <= spiritist; i++) {
+                userCount = currentRoomUsers.length;
+                let pointer = Math.floor(Math.random() * (userCount + 1))
+                var destinationUserId = currentRoomUsers[pointer].connected_User_Id;
+                await env.D1_DATABASE.prepare(
+                    "UPDATE ConnectedUsers SET role = ? WHERE connected_User_Id = ?"
+                ).bind("spiritist", destinationUserId).run();
+                currentRoomUsers.splice(pointer - 1, 1);
+            }
+            for (let i = 0; i <= knight; i++) {
+                userCount = currentRoomUsers.length;
+                let pointer = Math.floor(Math.random() * (userCount + 1))
+                var destinationUserId = currentRoomUsers[pointer].connected_User_Id;
+                await env.D1_DATABASE.prepare(
+                    "UPDATE ConnectedUsers SET role = ? WHERE connected_User_Id = ?"
+                ).bind("knight", destinationUserId).run();
+                currentRoomUsers.splice(pointer - 1, 1);
+            }
+            for (let i = 0; i <= madman; i++) {
+                userCount = currentRoomUsers.length;
+                let pointer = Math.floor(Math.random() * (userCount + 1))
+                var destinationUserId = currentRoomUsers[pointer].connected_User_Id;
+                await env.D1_DATABASE.prepare(
+                    "UPDATE ConnectedUsers SET role = ? WHERE connected_User_Id = ?"
+                ).bind("madman", destinationUserId).run();
+                currentRoomUsers.splice(pointer - 1, 1);
+            }
+            for (let i = 0; i <= fox; i++) {
+                userCount = currentRoomUsers.length;
+                let pointer = Math.floor(Math.random() * (userCount + 1))
+                var destinationUserId = currentRoomUsers[pointer].connected_User_Id;
+                await env.D1_DATABASE.prepare(
+                    "UPDATE ConnectedUsers SET role = ? WHERE connected_User_Id = ?"
+                ).bind("fox", destinationUserId).run();
+                currentRoomUsers.splice(pointer - 1, 1);
+            }
+            console.log("ロールアサインが完了しました。", JSON.stringify(currentRoomUsers))
             return [{ "type": "text", "text": "ゲームを開始します。" }, { "type": "text", "text": "まず、役職を配布します。このBotの個人チャットに行き、下の「役職を見る」ボタンを押してください。" }];
         }
     }
