@@ -163,8 +163,8 @@ export async function handleMention(data, request, env) {
         }
     }
     catch (error) {
-        console.log(error)
-        return 0;
+        console.log(error);
+        return -1;
     }
 }
 

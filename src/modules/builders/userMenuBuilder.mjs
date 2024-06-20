@@ -2,7 +2,7 @@ export async function userMenuBuilder(userIdList, modeName, env) {
     const { results: richMenus } = await env.D1_DATABASE.prepare(
         "SELECT * FROM Menus WHERE modeName = ?"
     ).bind(modeName).all();
-    richMenuId = richMenus[0].richMenuId;
+    const richMenuId = richMenus[0].richMenuId;
     for (const userId of userIdList) {
         const init = {
             method: "POST",
