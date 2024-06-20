@@ -23,7 +23,7 @@ export async function showRole(data, request, env) {
             return [{ "type": "text", "text": "どのルームにも参加していません。ルームに参加していないと、ゲームを開始することができません。" }];
         }
         else {
-            var roleName = queriedUserInfo[0].role;
+            const roleName = queriedUserInfo[0].role;
             if (owner == false) {
                 return [
                     {

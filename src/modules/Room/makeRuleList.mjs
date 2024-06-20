@@ -84,8 +84,7 @@ export async function makeRulelist(data, request, env) {
                 return returnJson;
             }
             else {
-                returnJson = [{ "type": "text", "text": "この人数で遊ぶことのできるルールがありません。" }]
-                return returnJson;
+                return [{ "type": "text", "text": "この人数で遊ぶことのできるルールがありません。" }];
             }
         }
     }

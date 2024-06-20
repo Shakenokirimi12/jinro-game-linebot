@@ -1,5 +1,5 @@
 export async function startDiscuss(data, request, env, time) {
-    const message = [
+    const returnJson = [
         {
             "type": "flex",
             "altText": "starter",
@@ -41,6 +41,5 @@ export async function startDiscuss(data, request, env, time) {
             }
         }
     ]
-    let returnJson = message;
-    return returnJson
+    return returnJson;
 }
