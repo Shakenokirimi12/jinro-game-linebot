@@ -84,7 +84,7 @@ export async function handleMention(data, request, env) {
 
                 if (queriedUserInfo[0].status == "voted") {
                     return [
-                        { "type": "text", "text": userData.displayName + "さんは投票済みです。" },
+                        { "type": "text", "text": `${userData.displayName}さんは投票済みです。` },
                     ];
                 }
                 else {
@@ -102,7 +102,7 @@ export async function handleMention(data, request, env) {
 
                 if (allUsersVoted(currentRoomConnectedUsersInfo)) {
                     return [
-                        { "type": "text", "text": userData.displayName + "さんが" + mentioneduserData.displayName + "さんに投票しました。" },
+                        { "type": "text", "text": `${userData.displayName}さんが${mentioneduserData.displayName}さんに投票しました。` },
                         { "type": "text", "text": "全ユーザーが投票を完了しました。追放者をみるには、以下のボタンを押してください。" },
                         {
                             "type": "flex",
@@ -152,7 +152,7 @@ export async function handleMention(data, request, env) {
 
                 } else {
                     return [
-                        { "type": "text", "text": userData.displayName + "さんが" + mentioneduserData.displayName + "さんに投票しました。" },
+                        { "type": "text", "text": `${userData.displayName}さんが${mentioneduserData.displayName}さんに投票しました。` },
                     ];
                 }
             }
@@ -213,7 +213,7 @@ export async function checkResult(data, request, env) {
             console.log("人狼の勝ち。");
             messages = [
                 { "type": "text", "text": "今回追放されたのは...." },
-                { "type": "text", "text": topUserName.displayName + "さんです。" + topUserName.displayName + "さんは今後、このゲームに参加することはできません。" },
+                { "type": "text", "text": `${topUserName.displayName}さんです。${topUserName.displayName}さんは今後、このゲームに参加することはできません。` },
                 { "type": "text", "text": "ここで、市民の数が人狼の数と同数になりました。人狼側の勝利です。ゲームを終了しますか？" },
                 { "type": "text", "text": "ゲームを終了しますか？" },
                 {
@@ -301,7 +301,7 @@ export async function checkResult(data, request, env) {
                 console.log("市民の勝ち。");
                 messages = [
                     { "type": "text", "text": "今回追放されたのは...." },
-                    { "type": "text", "text": topUserName.displayName + "さんです。" + topUserName.displayName + "さんは今後、このゲームに参加することはできません。 " },
+                    { "type": "text", "text": `${topUserName.displayName}さんです。${topUserName.displayName}さんは今後、このゲームに参加することはできません。` },
                     { "type": "text", "text": "ここで、人狼の数が0になりました。市民側の勝利です。" },
                     { "type": "text", "text": "ゲームを終了しますか？" },
                     {
@@ -388,8 +388,8 @@ export async function checkResult(data, request, env) {
                 console.log("勝敗決まらず。");
                 messages = [
                     { "type": "text", "text": "今回追放されたのは...." },
-                    { "type": "text", "text": topUserName.displayName + "さんです。" },
-                    { "type": "text", "text": topUserName.displayName + "さんは今後、このゲームに参加することはできません。" },
+                    { "type": "text", "text": `${topUserName.displayName}さんです。` },
+                    { "type": "text", "text": `${topUserName.displayName}さんは今後、このゲームに参加することはできません。` },
                     { "type": "text", "text": "まだゲームは続きます。" },
                     {
                         "type": "flex",
@@ -458,7 +458,7 @@ export async function checkResult(data, request, env) {
         const messages = [
             { "type": "text", "text": "今回、同数の投票がありました。同数投票があったのは、" },
             ...displayNames.map(name => ({ "type": "text", "text": `${name}さんです。` })),
-            { "type": "text", "text": displayNames.join('さん、') + "さんは今後、このゲームに参加することはできません。" }
+            { "type": "text", "text": `${displayNames.join('さん、')}さんは今後、このゲームに参加することはできません。` }
         ];
 
         console.log("メッセージ:", messages);

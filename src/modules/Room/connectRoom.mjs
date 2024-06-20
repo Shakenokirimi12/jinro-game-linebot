@@ -40,8 +40,8 @@ export async function connectRoom(data, request, env, BOT_URL) {
 
                 if (destinationRoomConnectedUsersInfo.length >= 4) {
                     return [
-                        { "type": "text", "text": userData.displayName + "さんがルーム" + roomCode + "に参加しました。" },
-                        { "type": "text", "text": "参加者が" + destinationRoomConnectedUsersInfo.length + "人になりました。ゲームを開始することができます。始める場合は下のボタンを押してください。" },
+                        { "type": "text", "text": `${userData.displayName}さんがルーム${roomCode}に参加しました。` },
+                        { "type": "text", "text": `参加者が${destinationRoomConnectedUsersInfo.length}人になりました。ゲームを開始することができます。始める場合は下のボタンを押してください。` },
                         {
                             "type": "flex",
                             "altText": "starter",
@@ -90,7 +90,7 @@ export async function connectRoom(data, request, env, BOT_URL) {
                 }
                 else {
                     return [
-                        { "type": "text", "text": userData.displayName + "さんがルーム" + roomCode + "に参加しました。" },
+                        { "type": "text", "text": `${userData.displayName}さんがルーム${roomCode}に参加しました。` },
                         { "type": "text", "text": "他に参加する方は、URLから友達登録の上、以下のボタンを押してください。" + BOT_URL },
                         {
                             "type": "flex",
@@ -144,7 +144,7 @@ export async function connectRoom(data, request, env, BOT_URL) {
             }
         }
         else {
-            return [{ "type": "text", "text": userData.displayName + "さんはすでにルームに参加しています。接続を解除するには、/jinro discon　と送信してください。ルームを作った人は、connectは必要ありません。" }];
+            return [{ "type": "text", "text": `${userData.displayName}さんはすでにルームに参加しています。\r\n接続を解除するには、/jinro discon　と送信してください。\r\nルームを作った人は、connectは必要ありません。` }];
         }
     }
 }

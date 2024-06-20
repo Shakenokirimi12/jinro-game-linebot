@@ -37,7 +37,7 @@ export async function ruleFlexBuilder(ruleName, citizen, werewolf, diviner, spir
                   "color": "#666666",
                   "size": "sm",
                   "flex": 5,
-                  "text": citizen + "人",
+                  "text": `${citizen}人`,
                 }
               ]
             },
@@ -59,7 +59,7 @@ export async function ruleFlexBuilder(ruleName, citizen, werewolf, diviner, spir
                   "color": "#666666",
                   "size": "sm",
                   "flex": 5,
-                  "text": werewolf + "人",
+                  "text": `${werewolf}人`,
                 }
               ]
             },
@@ -81,7 +81,7 @@ export async function ruleFlexBuilder(ruleName, citizen, werewolf, diviner, spir
                   "color": "#666666",
                   "size": "sm",
                   "flex": 5,
-                  "text": diviner + "人",
+                  "text": `${diviner}人`,
                 }
               ]
             },
@@ -103,7 +103,7 @@ export async function ruleFlexBuilder(ruleName, citizen, werewolf, diviner, spir
                   "color": "#666666",
                   "size": "sm",
                   "flex": 5,
-                  "text": spiritist + "人",
+                  "text": `${spiritist}人`,
                 }
               ]
             },
@@ -125,7 +125,7 @@ export async function ruleFlexBuilder(ruleName, citizen, werewolf, diviner, spir
                   "color": "#666666",
                   "size": "sm",
                   "flex": 5,
-                  "text": knight + "人",
+                  "text": `${knight}人`,
                 }
               ]
             },
@@ -147,7 +147,7 @@ export async function ruleFlexBuilder(ruleName, citizen, werewolf, diviner, spir
                   "color": "#666666",
                   "size": "sm",
                   "flex": 5,
-                  "text": madman + "人",
+                  "text": `${madman}人`,
                 }
               ]
             },
@@ -169,7 +169,7 @@ export async function ruleFlexBuilder(ruleName, citizen, werewolf, diviner, spir
                   "color": "#666666",
                   "size": "sm",
                   "flex": 5,
-                  "text": fox + "人",
+                  "text": `${fox}人`,
                 }
               ]
             }

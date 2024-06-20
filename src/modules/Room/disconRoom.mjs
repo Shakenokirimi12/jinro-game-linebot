@@ -19,10 +19,10 @@ export async function disconRoom(data, request, env) {
             "UPDATE Rooms SET connection_Count = ? WHERE room_Code = ?"
         ).bind(Number(currentRoomInfo[0].connection_Count) - 1, queriedUserInfo[0].room_Code).run();
         if (userData.displayName == undefined) {
-            return [{ "type": "text", "text": "ゲストさんがルーム" + queriedUserInfo[0].room_Code + "から切断しました。" }];
+            return [{ "type": "text", "text": `ゲストさんがルーム${queriedUserInfo[0].room_Code}から切断しました。` }];
         }
         else {
-            return [{ "type": "text", "text": userData.displayName + "さんがルーム" + queriedUserInfo[0].room_Code + "から切断しました。" }];
+            return [{ "type": "text", "text": `${userData.displayName}さんがルーム${queriedUserInfo[0].room_Code}から切断しました。` }];
         }
     }
     catch (error) {
