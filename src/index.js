@@ -7,7 +7,7 @@ import { applyRule } from "./modules/Room/applyRule.mjs";
 import { startGame } from "./modules/Game/startGame.mjs";
 import { showRole } from "./modules/Game/roleShower.mjs";
 import { startDiscuss } from "./modules/Game/startDiscuss.mjs";
-import { startElection } from "./modules/Game/electionOperator.mjs";
+import { checkResult, startElection } from "./modules/Game/electionOperator.mjs";
 import { handleMention } from "./modules/Game/electionOperator.mjs";
 
 
@@ -52,10 +52,13 @@ async function readRequestBody(request, env) {
           resmessage = await showRole(data, request, env);
           break;
         case "/jinro discuss start":
-          resmessage = await startDiscuss(data, request, env, 5);
+          resmessage = await startDiscuss(data, request, env, 600);
           break;
         case "/jinro timeup":
           resmessage = await startElection(data, request, env);
+          break;
+        case "/jinro check result":
+          resmessage = await checkResult(data, request, env);
           break;
         case "/jinro help":
           resmessage = [

@@ -8,17 +8,17 @@ export async function connectRoom(data, request, env, BOT_URL) {
     const roomCode = prompt.match(/\/jinro connect (\d{6})/)[1];
     console.log("6桁の数字:", roomCode);
     let currentTime = String(Math.floor((new Date()).getTime() / 1e3));
-    const { results: userConnectStatus } = await env.D1_DATABASE.prepare(
+    const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
         "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
     ).bind(queriedUserId).all();
     if (userData.displayName == undefined) {//友達登録をしていない場合 
         return [{ "type": "text", "text": "ゲームに参加するためには、このアカウントとの友達登録が必要です。" }, { "type": "text", "text": BOT_URL }];
     }
     else {
-        if (userConnectStatus.length == 0) {
+        if (queriedUserInfo.length == 0) {
             await env.D1_DATABASE.prepare(
-                "INSERT INTO ConnectedUsers VALUES ( ? , ? , ?, ? , ? )"
-            ).bind(roomCode, queriedUserId, currentTime, "connected", null).run();
+                "INSERT INTO ConnectedUsers VALUES ( ? , ? , ?, ? , ? ,? )"
+            ).bind(roomCode, queriedUserId, currentTime, "connected", null, 0).run();
 
             const { results: connectDestination } = await env.D1_DATABASE.prepare(
                 "SELECT * FROM Rooms WHERE room_Code = ?"
@@ -33,7 +33,111 @@ export async function connectRoom(data, request, env, BOT_URL) {
                     //ルームの接続数を1増やす=接続処理
                     "UPDATE Rooms SET connection_Count = ? WHERE room_Code = ?"
                 ).bind(Number(connectDestination[0].connection_Count) + 1, roomCode).run();
-                return [{ "type": "text", "text": userData.displayName + "さんがルーム" + roomCode + "に参加しました。" }];
+
+                const { results: destinationRoomConnectedUsersInfo } = await env.D1_DATABASE.prepare(
+                    "SELECT * FROM ConnectedUsers WHERE room_Code = ?"
+                ).bind(roomCode).all();
+
+                if (destinationRoomConnectedUsersInfo.length >= 4) {
+                    return [
+                        { "type": "text", "text": userData.displayName + "さんがルーム" + roomCode + "に参加しました。" },
+                        { "type": "text", "text": "参加者が" + destinationRoomConnectedUsersInfo.length + "人になりました。ゲームを開始することができます。始める場合は下のボタンを押してください。" },
+                        {
+                            "type": "flex",
+                            "altText": "starter",
+                            "contents": {
+                                "type": "carousel",
+                                "contents": [{
+                                    "type": "bubble",
+                                    "body": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "ルールを選ぶ",
+                                                "weight": "bold",
+                                                "size": "xl"
+                                            }
+                                        ]
+                                    },
+                                    "footer": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "spacing": "sm",
+                                        "contents": [
+                                            {
+                                                "type": "box",
+                                                "layout": "vertical",
+                                                "contents": [
+                                                    {
+                                                        "type": "button",
+                                                        "action": {
+                                                            "type": "message",
+                                                            "label": "ルール選択開始!",
+                                                            "text": "/jinro rule select"
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "flex": 0
+                                    }
+                                }]
+                            }
+                        }
+                    ];
+                }
+                else {
+                    return [
+                        { "type": "text", "text": userData.displayName + "さんがルーム" + roomCode + "に参加しました。" },
+                        { "type": "text", "text": "他に参加する方は、URLから友達登録の上、以下のボタンを押してください。" + BOT_URL },
+                        {
+                            "type": "flex",
+                            "altText": "starter",
+                            "contents": {
+                                "type": "carousel",
+                                "contents": [{
+                                    "type": "bubble",
+                                    "body": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "ルーム参加はこちら",
+                                                "weight": "bold",
+                                                "size": "xl"
+                                            }
+                                        ]
+                                    },
+                                    "footer": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "spacing": "sm",
+                                        "contents": [
+                                            {
+                                                "type": "box",
+                                                "layout": "vertical",
+                                                "contents": [
+                                                    {
+                                                        "type": "button",
+                                                        "action": {
+                                                            "type": "message",
+                                                            "label": "ルームに参加する!",
+                                                            "text": "/jinro connect " + roomCode
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "flex": 0
+                                    }
+                                }]
+                            }
+                        }
+                    ];
+                }
             }
             else {
                 return [{ "type": "text", "text": "ルームに接続できませんでした。ゲームが始まっています。" }];

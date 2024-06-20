@@ -27,12 +27,7 @@ export async function disconRoom(data, request, env) {
     }
     catch (error) {
         console.log(error);
-        if (String(error).includes("consistraint")) {
-            return [{ "type": "text", "text": "どのルームにも接続されていません。" }];
-        }
-        else {
-            return [{ "type": "text", "text": "サーバーでエラーが発生しました。" + error }];
-        }
+        return [{ "type": "text", "text": "どのルームにも接続されていません。" }];
     }
 
 }

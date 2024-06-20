@@ -25,20 +25,69 @@ export async function initRoom(data, request, env, BOT_URL) {
                     ).bind(roomCode, queriedUserId, null, currentTime, null, 1, "initialized", groupId).run();
 
                     await env.D1_DATABASE.prepare(
-                        "INSERT INTO ConnectedUsers VALUES ( ? , ? , ?, ? , ? )"
-                    ).bind(roomCode, queriedUserId, currentTime, "connected", null).run();
-                    return [{ "type": "text", "text": "ゲームを開始します。" + "\r\n" + "あなたのルームコードは" }, { "type": "text", "text": roomCode }, { "type": "text", "text": "です。" }, { "type": "text", "text": "参加する方は、このアカウントと友達になり、ルームコードを送信してください。" + "\r\n" + "全員の参加が完了したら、このグループで、 /jinro next を送ってください。" + "\r\n" + BOT_URL },];
+                        "INSERT INTO ConnectedUsers VALUES ( ? , ? , ?, ? , ? ,?)"
+                    ).bind(roomCode, queriedUserId, currentTime, "connected", null, 0).run();
+                    return [
+                        { "type": "text", "text": "ルームを作成します。" + "\r\n" + "あなたのルームコードは" },
+                        { "type": "text", "text": roomCode },
+                        { "type": "text", "text": "です。参加する方は、URLから友達登録の上、以下のボタンを押してください。" + BOT_URL },
+                        { "type": "text", "text": "現在このBotはAlpha版です。占いや騎士の守りなどが行えません。対応をお待ちください。" },
+                        {
+                            "type": "flex",
+                            "altText": "starter",
+                            "contents": {
+                                "type": "carousel",
+                                "contents": [{
+                                    "type": "bubble",
+                                    "body": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "ルーム参加はこちら",
+                                                "weight": "bold",
+                                                "size": "xl"
+                                            }
+                                        ]
+                                    },
+                                    "footer": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "spacing": "sm",
+                                        "contents": [
+                                            {
+                                                "type": "box",
+                                                "layout": "vertical",
+                                                "contents": [
+                                                    {
+                                                        "type": "button",
+                                                        "action": {
+                                                            "type": "message",
+                                                            "label": "ルームに参加する!",
+                                                            "text": "/jinro connect " + roomCode
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "flex": 0
+                                    }
+                                }]
+                            }
+                        }
+                    ];
                 }
                 else {
                     return [{ "type": "text", "text": "グループ内の誰かがゲームをすでに始めています。\r\n ルームコードは" }, { "type": "text", "text": searchByGroupId[0].room_Code }, { "type": "text", "text": "です。" }];
                 }
             }
             else {
-                return [{ "type": "text", "text": "すでにゲームを開始しています。 \r\n あなたのルームコードは" }, { "type": "text", "text": searchByUserId[0].room_Code }, { "type": "text", "text": "です。" }, { "type": "text", "text": "新しいゲームを開始したい場合は、現在のゲームを終了させる必要があります。  \r\n 終了するには、/jinro endと送信してください。" }]
+                return [{ "type": "text", "text": "すでにゲームを開始しています。 \r\n あなたのルームコードは" }, { "type": "text", "text": searchByUserId[0].room_Code }, { "type": "text", "text": "です。" }, { "type": "text", "text": "新しいゲームを開始したい場合は、現在のゲームを終了させる必要があります。  \r\n 終了するには、/jinro closeと送信してください。" }]
             }
         }
         else {
-            return [{ "type": "text", "text": "個人チャットからルームを開始することはできません... \r\n グループから開始操作を行なってください...."}];
+            return [{ "type": "text", "text": "個人チャットからルームを開始することはできません... \r\n グループから開始操作を行なってください...." }];
         }
     }
     catch (error) {
