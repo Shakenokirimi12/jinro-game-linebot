@@ -94,7 +94,7 @@ async function readRequestBody(request, env) {
         }),
         method: "POST",
         headers: {
-          Authorization: "Bearer " + env.ACCESS_TOKEN,
+          Authorization: `Bearer ${env.ACCESS_TOKEN}`,
           "content-type": "application/json"
         }
       }

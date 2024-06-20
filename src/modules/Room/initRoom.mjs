@@ -5,7 +5,7 @@ export async function initRoom(data, request, env, BOT_URL) {
     let S = "0123456789"
     let N = 6
     let roomCode = Array.from(Array(N)).map(() => S[Math.floor(Math.random() * S.length)]).join('')
-    console.log("Room code is :" + roomCode);
+    console.log(`Room code is :${roomCode}`);
     //ルームコード生成
     let queriedUserId = data.events[0].source.userId;
     let currentTime = String(Math.floor((new Date()).getTime() / 1e3)); //unixtime
@@ -30,7 +30,7 @@ export async function initRoom(data, request, env, BOT_URL) {
                     return [
                         { "type": "text", "text": "ルームを作成します。\r\nあなたのルームコードは" },
                         { "type": "text", "text": roomCode },
-                        { "type": "text", "text": "です。参加する方は、URLから友達登録の上、以下のボタンを押してください。" + BOT_URL },
+                        { "type": "text", "text": `です。参加する方は、URLから友達登録の上、以下のボタンを押してください。${BOT_URL}` },
                         { "type": "text", "text": "現在このBotはAlpha版です。占いや騎士の守りなどが行えません。対応をお待ちください。" },
                         {
                             "type": "flex",
@@ -65,7 +65,7 @@ export async function initRoom(data, request, env, BOT_URL) {
                                                         "action": {
                                                             "type": "message",
                                                             "label": "ルームに参加する!",
-                                                            "text": "/jinro connect " + roomCode
+                                                            "text": `/jinro connect ${roomCode}`
                                                         }
                                                     }
                                                 ]
@@ -92,6 +92,6 @@ export async function initRoom(data, request, env, BOT_URL) {
     }
     catch (error) {
         console.log(error);
-        return [{ "type": "text", "text": "サーバーでエラーが発生しました。" + error }];
+        return [{ "type": "text", "text": `サーバーでエラーが発生しました。 ${error}` }];
     }
 }

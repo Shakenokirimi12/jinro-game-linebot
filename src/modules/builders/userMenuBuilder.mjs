@@ -7,11 +7,11 @@ export async function userMenuBuilder(userIdList, modeName, env) {
         const init = {
             method: "POST",
             headers: {
-                Authorization: "Bearer " + env.ACCESS_TOKEN,
+                Authorization: `Bearer ${env.ACCESS_TOKEN}`,
             }
         }
         try {
-            const res = await fetch('https://api.line.me/v2/bot/user/' + userId + '/richmenu/' + richMenuId, init)
+            const res = await fetch(`https://api.line.me/v2/bot/user/${userId}/richmenu/${richMenuId}`, init)
             if (!res.ok) {
                 console.error(`Failed to associate rich menu with user ${userId}:`, res.status, res.statusText);
             } else {

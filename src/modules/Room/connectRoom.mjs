@@ -91,7 +91,7 @@ export async function connectRoom(data, request, env, BOT_URL) {
                 else {
                     return [
                         { "type": "text", "text": `${userData.displayName}さんがルーム${roomCode}に参加しました。` },
-                        { "type": "text", "text": "他に参加する方は、URLから友達登録の上、以下のボタンを押してください。" + BOT_URL },
+                        { "type": "text", "text": `他に参加する方は、URLから友達登録の上、以下のボタンを押してください。${BOT_URL}` },
                         {
                             "type": "flex",
                             "altText": "starter",
@@ -125,7 +125,7 @@ export async function connectRoom(data, request, env, BOT_URL) {
                                                         "action": {
                                                             "type": "message",
                                                             "label": "ルームに参加する!",
-                                                            "text": "/jinro connect " + roomCode
+                                                            "text": `/jinro connect ${roomCode}`
                                                         }
                                                     }
                                                 ]

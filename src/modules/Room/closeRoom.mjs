@@ -26,6 +26,6 @@ export async function closeRoom(data, request, env) {
         }
     }
     catch (error) {
-        return [{ "type": "text", "text": "サーバーでエラーが発生しました。" + error }];
+        return [{ "type": "text", "text": `サーバーでエラーが発生しました。 ${error}` }];
     }
 }
