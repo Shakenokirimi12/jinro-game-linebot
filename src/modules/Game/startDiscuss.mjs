@@ -30,7 +30,7 @@ export async function startDiscuss(data, request, env, time) {
                                 "height": "sm",
                                 "action": {
                                     "type": "uri",
-                                    "label": "議論開始！",
+                                    "label": "タイマースタート！",
                                     "uri": `https://liff.line.me/2005594448-4jkJQ872?time=${time}`
                                 }
                             }

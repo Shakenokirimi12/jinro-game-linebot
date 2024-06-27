@@ -28,6 +28,10 @@ export async function startGame(data, request, env) {
                 "UPDATE ConnectedUsers SET votes = ? WHERE room_Code = ?"
             ).bind(0, queriedUserInfo[0].room_Code).all();
 
+            await env.D1_DATABASE.prepare(
+                "UPDATE Rooms SET status = ? WHERE room_Code = ?"
+            ).bind("day1night", queriedUserInfo[0].room_Code).all();
+
             let roomRule = currentRoomInfo[0].room_Type_Code;
             let citizen = parseInt(roomRule[0]);
             let werewolf = parseInt(roomRule[1]);
@@ -66,6 +70,7 @@ export async function startGame(data, request, env) {
             return [
                 { "type": "text", "text": "ゲームを開始します。" },
                 { "type": "text", "text": "まず、役職を配布し、夜のターンを行います。このBotの個人チャットに行き、下の「役職を見る」ボタンを押してください。" },
+                { "type": "text", "text": "全員が役職を見終わったら、ルームを作った人が下の「議論タイム開始」を押してください、" },
                 {
                     "type": "flex",
                     "altText": "starter",
@@ -79,7 +84,7 @@ export async function startGame(data, request, env) {
                                 "contents": [
                                     {
                                         "type": "text",
-                                        "text": "議論を始める",
+                                        "text": "次へ進む",
                                         "weight": "bold",
                                         "size": "xl"
                                     }
@@ -98,7 +103,7 @@ export async function startGame(data, request, env) {
                                                 "type": "button",
                                                 "action": {
                                                     "type": "message",
-                                                    "label": "議論を始める",
+                                                    "label": "議論タイム開始",
                                                     "text": "/jinro discuss start"
                                                 }
                                             }
