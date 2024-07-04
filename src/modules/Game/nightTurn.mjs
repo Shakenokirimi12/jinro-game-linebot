@@ -338,10 +338,10 @@ export async function killSomeoneByWerewolf(data, request, env) {
     ).bind(queriedUserInfo[0].room_Code).all();
 
     let prompt = data.events[0].message.text;
-    const targetUserId = prompt.match(/\/jinro kill U[0-9a-f]{32}/)[1];
+    const targetUserId = prompt.match(/\/jinro divine (U[0-9a-f]{32})/)[1];
     let status = currentRoomInfo[0].status;
 
-    if (!(status == "day1night") && status.includes("night")) {
+    if (status.includes("night")) {
         const { results: targetUserInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
         ).bind(targetUserId).all();
@@ -351,7 +351,7 @@ export async function killSomeoneByWerewolf(data, request, env) {
                 "UPDATE ConnectedUsers SET status = ? WHERE connected_User_Id = ?"
             ).bind("died-0", targetUserId).all();
             let targetUserProfile = await getUserProfile(env, targetUserId);
-            return [
+            returnValue = [
                 { "type": "text", "text": `${targetUserProfile.displayName}さんを殺しました。` },
             ];
         }
@@ -364,6 +364,7 @@ export async function killSomeoneByWerewolf(data, request, env) {
             returnValue.push(await selectSomeoneByWerewolf(data, request, env, status))
         }
     }
+    console.log("返信の内容", returnValue);
     return returnValue;
 
 }
@@ -384,17 +385,21 @@ export async function divineSomeoneByDiviner(data, request, env) {
     ).bind(queriedUserInfo[0].room_Code).all();
 
     let prompt = data.events[0].message.text;
-    const targetUserId = prompt.match(/\/jinro divine U[0-9a-f]{32}/)[1];
+    const targetUserId = prompt.match(/\/jinro divine (U[0-9a-f]{32})/)[1];
+    console.log(targetUserId)
     let status = currentRoomInfo[0].status;
 
-    if (!(status == "day1night") && status.includes("night")) {
+    if (status.includes("night")) {
         const { results: targetUserInfo } = await env.D1_DATABASE.prepare(
             "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
         ).bind(targetUserId).all();
         let targetUserStatus = targetUserInfo[0].status;
+        console.log(targetUserStatus);
         if (targetUserStatus == "alive") {
             let targetUserProfile = await getUserProfile(env, targetUserId);
             const roleName = targetUserInfo[0].role;
+            console.log(targetUserProfile.displayName);
+            console.log(roleName);
             returnValue = [
                 {
                     "type": "text", "text": `${targetUserProfile.displayName}さんの役職は以下の通りです。`
@@ -415,6 +420,7 @@ export async function divineSomeoneByDiviner(data, request, env) {
             returnValue.push(await selectSomeoneByDiviner(data, request, env, status))
         }
     }
+    console.log("返信の内容", returnValue);
     return returnValue;
 }
 

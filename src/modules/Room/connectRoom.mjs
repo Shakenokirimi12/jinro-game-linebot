@@ -41,6 +41,51 @@ export async function connectRoom(data, request, env, BOT_URL) {
                 if (destinationRoomConnectedUsersInfo.length >= 4) {
                     return [
                         { "type": "text", "text": `${userData.displayName}さんがルーム${roomCode}に参加しました。` },
+                        { "type": "text", "text": `他に参加する方は、URLから友達登録の上、以下のボタンを押してください。${BOT_URL}` },
+                        {
+                            "type": "flex",
+                            "altText": "starter",
+                            "contents": {
+                                "type": "carousel",
+                                "contents": [{
+                                    "type": "bubble",
+                                    "body": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "contents": [
+                                            {
+                                                "type": "text",
+                                                "text": "ルーム参加はこちら",
+                                                "weight": "bold",
+                                                "size": "xl"
+                                            }
+                                        ]
+                                    },
+                                    "footer": {
+                                        "type": "box",
+                                        "layout": "vertical",
+                                        "spacing": "sm",
+                                        "contents": [
+                                            {
+                                                "type": "box",
+                                                "layout": "vertical",
+                                                "contents": [
+                                                    {
+                                                        "type": "button",
+                                                        "action": {
+                                                            "type": "message",
+                                                            "label": "ルームに参加する!",
+                                                            "text": `/jinro connect ${roomCode}`
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "flex": 0
+                                    }
+                                }]
+                            }
+                        },
                         { "type": "text", "text": `参加者が${destinationRoomConnectedUsersInfo.length}人になりました。ゲームを開始することができます。始める場合は下のボタンを押してください。` },
                         {
                             "type": "flex",

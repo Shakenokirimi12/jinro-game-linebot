@@ -77,15 +77,19 @@ async function readRequestBody(request, env) {
             resmessage = await applyRule(data, request, env)
           }
           else if (prompt.match(/\/jinro kill U[0-9a-f]{32}/)) {
+            console.log("人狼の夜のターン");
             resmessage = await killSomeoneByWerewolf(data, request, env)
           }
           else if (prompt.match(/\/jinro save U[0-9a-f]{32}/)) {
+            console.log("騎士の夜のターン");
             resmessage = await saveSomeonebyKnight(data, request, env)
           }
           else if (prompt.match(/\/jinro see U[0-9a-f]{32}/)) {
+            console.log("霊媒師の夜のターン");
             resmessage = await seeSomeoneBySpiritist(data, request, env)
           }
           else if (prompt.match(/\/jinro divine U[0-9a-f]{32}/)) {
+            console.log("占い師の夜のターン");
             resmessage = await divineSomeoneByDiviner(data, request, env)
           }
           else if (prompt.includes("@")) {
