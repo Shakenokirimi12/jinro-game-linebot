@@ -9,6 +9,7 @@ import { showRole } from "./modules/Game/roleShower.mjs";
 import { startDiscuss } from "./modules/Game/startDiscuss.mjs";
 import { checkResult, startElection } from "./modules/Game/electionOperator.mjs";
 import { handleMention } from "./modules/Game/electionOperator.mjs";
+import { divineSomeoneByDiviner, killSomeoneByWerewolf, saveSomeonebyKnight, seeSomeoneBySpiritist } from "./modules/Game/nightTurn.mjs";
 
 
 const BOT_URL = "https://lin.ee/H6oMBxr"
@@ -74,6 +75,18 @@ async function readRequestBody(request, env) {
           }
           else if (prompt.match(/\/jinro rule \d{7}/)) {
             resmessage = await applyRule(data, request, env)
+          }
+          else if (prompt.match(/\/jinro kill U[0-9a-f]{32}/)) {
+            resmessage = await killSomeoneByWerewolf(data, request, env)
+          }
+          else if (prompt.match(/\/jinro save U[0-9a-f]{32}/)) {
+            resmessage = await saveSomeonebyKnight(data, request, env)
+          }
+          else if (prompt.match(/\/jinro see U[0-9a-f]{32}/)) {
+            resmessage = await seeSomeoneBySpiritist(data, request, env)
+          }
+          else if (prompt.match(/\/jinro divine U[0-9a-f]{32}/)) {
+            resmessage = await divineSomeoneByDiviner(data, request, env)
           }
           else if (prompt.includes("@")) {
             resmessage = await handleMention(data, request, env)

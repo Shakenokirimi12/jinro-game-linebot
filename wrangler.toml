@@ -3,8 +3,11 @@ name = "line-de-jinro"
 main = "src/index.js"
 compatibility_date = "2024-04-23"
 compatibility_flags = ["nodejs_compat"]
+logpush = true
+workers_dev = false
 
 [[d1_databases]]
 binding = "D1_DATABASE"
 database_name = "line-de-jinro"
 database_id = "782db710-52d9-48af-92a1-80a4732bed4a"
+

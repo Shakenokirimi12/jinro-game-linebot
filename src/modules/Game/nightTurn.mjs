@@ -327,14 +327,95 @@ async function selectSomeoneBySpiritist(data, request, env, status) {
 
 
 export async function killSomeoneByWerewolf(data, request, env) {
+    let returnValue;
+    let queriedUserId = data.events[0].source.userId;
+
+    const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
+    ).bind(queriedUserId).all();
+    const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM Rooms WHERE room_Code = ?"
+    ).bind(queriedUserInfo[0].room_Code).all();
+
+    let prompt = data.events[0].message.text;
+    const targetUserId = prompt.match(/\/jinro kill U[0-9a-f]{32}/)[1];
+    let status = currentRoomInfo[0].status;
+
+    if (!(status == "day1night") && status.includes("night")) {
+        const { results: targetUserInfo } = await env.D1_DATABASE.prepare(
+            "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
+        ).bind(targetUserId).all();
+        let targetUserStatus = targetUserInfo[0].status;
+        if (targetUserStatus == "alive") {
+            await env.D1_DATABASE.prepare(
+                "UPDATE ConnectedUsers SET status = ? WHERE connected_User_Id = ?"
+            ).bind("died-0", targetUserId).all();
+            let targetUserProfile = await getUserProfile(env, targetUserId);
+            return [
+                { "type": "text", "text": `${targetUserProfile.displayName}さんを殺しました。` },
+            ];
+        }
+        else {
+            let targetUserProfile = await getUserProfile(env, targetUserId);
+            returnValue = [
+                { "type": "text", "text": `${targetUserProfile.displayName}さんを殺すことはできません。` },
+                { "type": "text", "text": `再度選択してください。` }
+            ];
+            returnValue.push(await selectSomeoneByWerewolf(data, request, env, status))
+        }
+    }
+    return returnValue;
 
 }
 
 export async function saveSomeonebyKnight(data, request, env) {
+
 }
 
 export async function divineSomeoneByDiviner(data, request, env) {
+    let returnValue;
+    let queriedUserId = data.events[0].source.userId;
 
+    const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
+    ).bind(queriedUserId).all();
+    const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM Rooms WHERE room_Code = ?"
+    ).bind(queriedUserInfo[0].room_Code).all();
+
+    let prompt = data.events[0].message.text;
+    const targetUserId = prompt.match(/\/jinro divine U[0-9a-f]{32}/)[1];
+    let status = currentRoomInfo[0].status;
+
+    if (!(status == "day1night") && status.includes("night")) {
+        const { results: targetUserInfo } = await env.D1_DATABASE.prepare(
+            "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
+        ).bind(targetUserId).all();
+        let targetUserStatus = targetUserInfo[0].status;
+        if (targetUserStatus == "alive") {
+            let targetUserProfile = await getUserProfile(env, targetUserId);
+            const roleName = targetUserInfo[0].role;
+            returnValue = [
+                {
+                    "type": "text", "text": `${targetUserProfile.displayName}さんの役職は以下の通りです。`
+                },
+                {
+                    "type": "image",
+                    "originalContentUrl": `https://jinro-resources.pages.dev/${roleName}.PNG`,
+                    "previewImageUrl": `https://jinro-resources.pages.dev/${roleName}.PNG`
+                }
+            ];
+        }
+        else {
+            let targetUserProfile = await getUserProfile(env, targetUserId);
+            returnValue = [
+                { "type": "text", "text": `${targetUserProfile.displayName}さんを占うことはできません。` },
+                { "type": "text", "text": `再度選択してください。` }
+            ];
+            returnValue.push(await selectSomeoneByDiviner(data, request, env, status))
+        }
+    }
+    return returnValue;
 }
 
 export async function seeSomeoneBySpiritist(data, request, env) {

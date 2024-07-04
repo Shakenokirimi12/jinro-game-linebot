@@ -202,8 +202,7 @@ export async function checkResult(data, request, env) {
         const aliveUsers = resultRoomConnectedUsersInfo.filter(user => user.status === "alive");
         const aliveWerewolves = aliveUsers.filter(user => user.role === "werewolf");
         const aliveNonWerewolves = aliveUsers.filter(user => user.role !== "werewolf");
-
-        const aliveWerewolvesCount = aliveWerewolves.length;
+ 
         const aliveNonWerewolvesCount = aliveNonWerewolves.length;
 
         console.log("生存している人狼の数:", aliveWerewolvesCount);
