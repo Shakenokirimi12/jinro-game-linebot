@@ -434,7 +434,7 @@ export async function divineSomeoneByDiviner(data, request, env) {
         ).bind(targetUserId).all();
         let targetUserStatus = targetUserInfo[0].status;
         console.log(targetUserStatus);
-        if (targetUserStatus == "alive") {
+        if (targetUserStatus == "alive" || targetUserStatus == "saved" || targetUserStatus == "died-0") {
             let targetUserProfile = await getUserProfile(env, targetUserId);
             const roleName = targetUserInfo[0].role;
             console.log(targetUserProfile.displayName);
@@ -470,13 +470,13 @@ export async function seeSomeoneBySpiritist(data, request, env) {
     const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
         "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
     ).bind(queriedUserId).all();
+    const { results: targetUserInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM ConnectedUsers WHERE room_Code = ? AND status = ?"
+    ).bind(queriedUserInfo[0].room_Code, "exiled-1").all();
     const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
         "SELECT * FROM Rooms WHERE room_Code = ?"
     ).bind(queriedUserInfo[0].room_Code).all();
 
-    let prompt = data.events[0].message.text;
-    const targetUserId = prompt.match(/\/jinro see (U[0-9a-f]{32})/)[1];
-    console.log(targetUserId)
     let status = currentRoomInfo[0].status;
 
     if (status.includes("night")) {
@@ -487,9 +487,8 @@ export async function seeSomeoneBySpiritist(data, request, env) {
         const werewolves = userInRoom.filter(user => user.role === "werewolf");
         let targetUserStatus = queriedUserInfo[0].status;
         console.log(targetUserStatus);
-        if (targetUserStatus.includes("dead")) {
-            let targetUserProfile = await getUserProfile(env, targetUserId);
-            const roleName = queriedUserInfo[0].role;
+        if (targetUserStatus == "exiled-1") {
+            const roleName = targetUserInfo[0].role;
             console.log(targetUserProfile.displayName);
             console.log(roleName);
             returnValue = [
@@ -537,7 +536,6 @@ async function getUserIdsList(env, connectedUsers) {
     let userIds = [];
 
     for (const user of connectedUsers) {
-        const userId = user.connected_User_Id;
         userIds.push(user.connected_User_Id);
     }
 

@@ -124,7 +124,7 @@ async function readRequestBody(request, env) {
             console.log("騎士の夜のターン");
             resmessage = await saveSomeonebyKnight(data, request, env)
           }
-          else if (prompt.match(/\/jinro see U[0-9a-f]{32}/)) {
+          else if (prompt == "/jinro see") {
             console.log("霊媒師の夜のターン");
             resmessage = await seeSomeoneBySpiritist(data, request, env)
           }

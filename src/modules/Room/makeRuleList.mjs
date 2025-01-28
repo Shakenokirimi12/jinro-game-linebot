@@ -72,6 +72,10 @@ export async function makeRulelist(data, request, env) {
                         "text": "遊びたいルールを選んでください。"
                     },
                     {
+                        "type": "text",
+                        "text": "なお、本Botではデフォルトで以下のルールが適用されます。\r\n ・一夜殺しなし \r\n ・同数投票はランダムで処刑"
+                    },
+                    {
                         "type": "flex",
                         "altText": "Rule-Selector",
                         "contents": {

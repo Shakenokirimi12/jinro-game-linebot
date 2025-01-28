@@ -1,4 +1,4 @@
-export async function startElection(data, request, env) {
+export async function startElection(data, env) {
     let queriedUserId = data.events[0].source.userId;
     let origintype = data.events[0].source.type;
     if (origintype == "group") {
@@ -11,7 +11,9 @@ export async function startElection(data, request, env) {
 
         const displayNamesList = await getUserProfilesList(env, connectedUsers);
         console.log(displayNamesList); // 結果をコンソールに出力
-
+        if (displayNamesList == "") {
+            return [{ "type": "text", "text": "エラーが発生しました。このコマンドは現在の状態では実行できない可能性があります。" }];
+        }
         //userのlistを取得するコード
         return [
             { "type": "text", "text": "タイムアップです。議論を止めてください。" },
@@ -203,6 +205,7 @@ export async function checkResult(data, request, env) {
         const aliveWerewolves = aliveUsers.filter(user => user.role === "werewolf");
         const aliveNonWerewolves = aliveUsers.filter(user => user.role !== "werewolf");
 
+        const aliveWerewolvesCount = aliveWerewolves.length;
         const aliveNonWerewolvesCount = aliveNonWerewolves.length;
 
         console.log("生存している人狼の数:", aliveWerewolvesCount);
@@ -213,7 +216,7 @@ export async function checkResult(data, request, env) {
             messages = [
                 { "type": "text", "text": "今回追放されたのは...." },
                 { "type": "text", "text": `${topUserName.displayName}さんです。` },
-                { "type": "text", "text": "ここで、市民の数が人狼の数と同数になりました。人狼側の勝利です。ゲームを終了しますか？" },
+                { "type": "text", "text": "ここで、市民の数が人狼の数と同数になりました。人狼側の勝利です。" },
                 { "type": "text", "text": "ゲームを終了しますか？" },
                 {
                     "type": "flex",
@@ -437,7 +440,7 @@ export async function checkResult(data, request, env) {
         //ステータスアップデート
         await env.D1_DATABASE.prepare(
             "UPDATE ConnectedUsers SET status = ? WHERE connected_User_Id = ?"
-        ).bind("died-1", topUserId).all();
+        ).bind("exiled-1", topUserId).all();
         await env.D1_DATABASE.prepare(
             "UPDATE ConnectedUsers SET status = ? WHERE room_Code = ? AND status != 'dead'"
         ).bind("alive", queriedUserInfo[0].room_Code).all();
@@ -447,6 +450,9 @@ export async function checkResult(data, request, env) {
         ).bind(0, queriedUserInfo[0].room_Code).all();
         await env.D1_DATABASE.prepare(
             "UPDATE ConnectedUsers SET status = 'dead-' || CAST(SUBSTR(status, 6) + 1 AS TEXT) WHERE status LIKE 'dead-%'"
+        ).run();
+        await env.D1_DATABASE.prepare(
+            "UPDATE ConnectedUsers SET status = 'exiled-' || CAST(SUBSTR(status, 6) + 1 AS TEXT) WHERE status LIKE 'exiled-%'"
         ).run();
         return messages;
     } else {
@@ -458,8 +464,36 @@ export async function checkResult(data, request, env) {
         const messages = [
             { "type": "text", "text": "今回、同数の投票がありました。同数投票があったのは、" },
             ...displayNames.map(name => ({ "type": "text", "text": `${name}さんです。` })),
-            { "type": "text", "text": `${displayNames.join('さん、')}さんは今後、このゲームに参加することはできません。` }
         ];
+
+        if (topVotedUsers.length > 1) {
+            // 同数投票の場合、ランダムに一人を選んで処刑
+            const randomIndex = Math.floor(Math.random() * topVotedUsers.length);
+            const exiledUserId = topVotedUsers[randomIndex];
+
+            await env.D1_DATABASE.prepare(
+                "UPDATE ConnectedUsers SET status = 'exiled-1' WHERE connected_User_Id = ?"
+            ).bind(exiledUserId).run();
+            await env.D1_DATABASE.prepare(
+                "UPDATE ConnectedUsers SET status = 'dead-' || CAST(SUBSTR(status, 6) + 1 AS TEXT) WHERE status LIKE 'dead-%'"
+            ).run();
+            await env.D1_DATABASE.prepare(
+                "UPDATE ConnectedUsers SET status = 'exiled-' || CAST(SUBSTR(status, 6) + 1 AS TEXT) WHERE status LIKE 'exiled-%'"
+            ).run();
+            await env.D1_DATABASE.prepare(
+                "UPDATE ConnectedUsers SET status = ? WHERE room_Code = ? AND status != 'dead'"
+            ).bind("alive", queriedUserInfo[0].room_Code).all();
+
+            await env.D1_DATABASE.prepare(
+                "UPDATE ConnectedUsers SET votes = ? WHERE room_Code = ?"
+            ).bind(0, queriedUserInfo[0].room_Code).all();
+            let exiledUserProfile = await getUserProfile(env, exiledUserId);
+            messages.push({
+                "type": "text",
+                "text": `${exiledUserProfile.displayName}さんがランダムに処刑されました。${exiledUserProfile.displayName}さんは今後、このゲームに参加することはできません。`
+            });
+        }
+
         console.log("メッセージ:", messages);
         return messages;
     }
