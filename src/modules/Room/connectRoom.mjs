@@ -12,7 +12,52 @@ export async function connectRoom(data, request, env, BOT_URL) {
         "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
     ).bind(queriedUserId).all();
     if (userData.displayName == undefined) {//友達登録をしていない場合 
-        return [{ "type": "text", "text": "ゲームに参加するためには、このアカウントとの友達登録が必要です。" }, { "type": "text", "text": BOT_URL }];
+        return [
+            { "type": "text", "text": "ゲームに参加するためには、このアカウントとの友達登録が必要です。" },
+            { "type": "text", "text": BOT_URL }, {
+                "type": "flex",
+                "altText": "starter",
+                "contents": {
+                    "type": "carousel",
+                    "contents": [{
+                        "type": "bubble",
+                        "body": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                                {
+                                    "type": "text",
+                                    "text": "ルーム参加はこちら",
+                                    "weight": "bold",
+                                    "size": "xl"
+                                }
+                            ]
+                        },
+                        "footer": {
+                            "type": "box",
+                            "layout": "vertical",
+                            "spacing": "sm",
+                            "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "vertical",
+                                    "contents": [
+                                        {
+                                            "type": "button",
+                                            "action": {
+                                                "type": "message",
+                                                "label": "登録完了したのでルームに参加する!",
+                                                "text": `/jinro connect ${roomCode}`
+                                            }
+                                        }
+                                    ]
+                                }
+                            ],
+                            "flex": 0
+                        }
+                    }]
+                }
+            }];
     }
     else {
         if (queriedUserInfo.length == 0) {

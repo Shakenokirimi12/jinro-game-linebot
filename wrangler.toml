@@ -3,7 +3,6 @@ name = "line-de-jinro"
 main = "src/index.js"
 compatibility_date = "2024-04-23"
 compatibility_flags = ["nodejs_compat"]
-logpush = true
 workers_dev = false
 
 [[d1_databases]]

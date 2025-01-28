@@ -64,8 +64,48 @@ async function readRequestBody(request, env) {
         case "/jinro help":
           resmessage = [
             {
-              "type": "text",
-              "text": "ゲームを始めるには \r\n /jinro init \r\n ゲームを終了するには \r\n　/jinro close \r\n ルームに接続するには \r\n /jinro connect 000000 \r\n (000000はルームコードに置き換えてください)"
+              "type": "flex",
+              "altText": "starter",
+              "contents": {
+                "type": "carousel",
+                "contents": [{
+                  "type": "bubble",
+                  "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "ゲーム操作コマンド一覧",
+                        "weight": "bold",
+                        "size": "sm"
+                      }
+                    ]
+                  },
+                  "footer": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "spacing": "sm",
+                    "contents": [{
+                      "type": "button",
+                      "action": {
+                        "type": "message",
+                        "label": "ゲームを開始する",
+                        "text": `/jinro init`
+                      }
+                    },
+                    {
+                      "type": "button",
+                      "action": {
+                        "type": "message",
+                        "label": "ゲームを終了する",
+                        "text": `/jinro close`
+                      }
+                    }],
+                    "flex": 0
+                  }
+                }]
+              }
             }
           ];
           break;
@@ -99,7 +139,50 @@ async function readRequestBody(request, env) {
             resmessage = [
               {
                 "type": "text",
-                "text": "コマンドが間違っています。タイプミスがないかご確認ください。"
+                "text": "コマンドが間違っています。"
+              }, {
+                "type": "flex",
+                "altText": "starter",
+                "contents": {
+                  "type": "carousel",
+                  "contents": [{
+                    "type": "bubble",
+                    "body": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "contents": [
+                        {
+                          "type": "text",
+                          "text": "ゲーム操作コマンド一覧",
+                          "weight": "bold",
+                          "size": "sm"
+                        }
+                      ]
+                    },
+                    "footer": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "sm",
+                      "contents": [{
+                        "type": "button",
+                        "action": {
+                          "type": "message",
+                          "label": "ゲームを開始する",
+                          "text": `/jinro init`
+                        }
+                      },
+                      {
+                        "type": "button",
+                        "action": {
+                          "type": "message",
+                          "label": "ゲームを終了する",
+                          "text": `/jinro close`
+                        }
+                      }],
+                      "flex": 0
+                    }
+                  }]
+                }
               }]
           }
       }

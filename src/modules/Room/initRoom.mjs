@@ -30,7 +30,7 @@ export async function initRoom(data, request, env, BOT_URL) {
                     return [
                         { "type": "text", "text": "ルームを作成します。\r\nあなたのルームコードは" },
                         { "type": "text", "text": roomCode },
-                        { "type": "text", "text": `です。参加する方は、URLから友達登録の上、以下のボタンを押してください。${BOT_URL}` },
+                        { "type": "text", "text": `です。\r\n参加する方は、URLから友達登録の上、以下のボタンを押してください。${BOT_URL}` },
                         { "type": "text", "text": "現在このBotはAlpha版です。占いや騎士の守りなどが行えません。対応をお待ちください。" },
                         {
                             "type": "flex",
