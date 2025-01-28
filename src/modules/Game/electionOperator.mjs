@@ -202,7 +202,7 @@ export async function checkResult(data, request, env) {
         const aliveUsers = resultRoomConnectedUsersInfo.filter(user => user.status === "alive");
         const aliveWerewolves = aliveUsers.filter(user => user.role === "werewolf");
         const aliveNonWerewolves = aliveUsers.filter(user => user.role !== "werewolf");
- 
+
         const aliveNonWerewolvesCount = aliveNonWerewolves.length;
 
         console.log("生存している人狼の数:", aliveWerewolvesCount);
@@ -212,7 +212,7 @@ export async function checkResult(data, request, env) {
             console.log("人狼の勝ち。");
             messages = [
                 { "type": "text", "text": "今回追放されたのは...." },
-                { "type": "text", "text": `${topUserName.displayName}さんです。${topUserName.displayName}さんは今後、このゲームに参加することはできません。` },
+                { "type": "text", "text": `${topUserName.displayName}さんです。` },
                 { "type": "text", "text": "ここで、市民の数が人狼の数と同数になりました。人狼側の勝利です。ゲームを終了しますか？" },
                 { "type": "text", "text": "ゲームを終了しますか？" },
                 {
@@ -300,7 +300,7 @@ export async function checkResult(data, request, env) {
                 console.log("市民の勝ち。");
                 messages = [
                     { "type": "text", "text": "今回追放されたのは...." },
-                    { "type": "text", "text": `${topUserName.displayName}さんです。${topUserName.displayName}さんは今後、このゲームに参加することはできません。` },
+                    { "type": "text", "text": `${topUserName.displayName}さんです。` },
                     { "type": "text", "text": "ここで、人狼の数が0になりました。市民側の勝利です。" },
                     { "type": "text", "text": "ゲームを終了しますか？" },
                     {
@@ -437,8 +437,7 @@ export async function checkResult(data, request, env) {
         //ステータスアップデート
         await env.D1_DATABASE.prepare(
             "UPDATE ConnectedUsers SET status = ? WHERE connected_User_Id = ?"
-        ).bind("dead", topUserId).all();
-
+        ).bind("died-1", topUserId).all();
         await env.D1_DATABASE.prepare(
             "UPDATE ConnectedUsers SET status = ? WHERE room_Code = ? AND status != 'dead'"
         ).bind("alive", queriedUserInfo[0].room_Code).all();
@@ -446,8 +445,10 @@ export async function checkResult(data, request, env) {
         await env.D1_DATABASE.prepare(
             "UPDATE ConnectedUsers SET votes = ? WHERE room_Code = ?"
         ).bind(0, queriedUserInfo[0].room_Code).all();
+        await env.D1_DATABASE.prepare(
+            "UPDATE ConnectedUsers SET status = 'dead-' || CAST(SUBSTR(status, 6) + 1 AS TEXT) WHERE status LIKE 'dead-%'"
+        ).run();
         return messages;
-        // ここに処理を続行するコードを書く
     } else {
         // 配列の場合（同数投票の場合）
         const userProfiles = await Promise.all(
@@ -459,7 +460,6 @@ export async function checkResult(data, request, env) {
             ...displayNames.map(name => ({ "type": "text", "text": `${name}さんです。` })),
             { "type": "text", "text": `${displayNames.join('さん、')}さんは今後、このゲームに参加することはできません。` }
         ];
-
         console.log("メッセージ:", messages);
         return messages;
     }

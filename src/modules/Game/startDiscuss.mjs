@@ -39,6 +39,50 @@ export async function startDiscuss(data, request, env, time) {
                     }
                 }]
             }
+        },
+        {
+            "type": "flex",
+            "altText": "starter",
+            "contents": {
+                "type": "carousel",
+                "contents": [{
+                    "type": "bubble",
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {
+                                "type": "text",
+                                "text": "議論を終了するときに押してください。",
+                                "weight": "bold",
+                                "size": "xl"
+                            }
+                        ]
+                    },
+                    "footer": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "spacing": "sm",
+                        "contents": [
+                            {
+                                "type": "box",
+                                "layout": "vertical",
+                                "contents": [
+                                    {
+                                        "type": "button",
+                                        "action": {
+                                            "type": "message",
+                                            "label": "議論終了!",
+                                            "text": `/jinro discuss end`
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        "flex": 0
+                    }
+                }]
+            }
         }
     ]
     return returnJson;

@@ -346,13 +346,13 @@ export async function killSomeoneByWerewolf(data, request, env) {
             "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
         ).bind(targetUserId).all();
         let targetUserStatus = targetUserInfo[0].status;
-        if (targetUserStatus == "alive") {
+        if (targetUserStatus == "alive" || targetUserStatus == "saved") {
             await env.D1_DATABASE.prepare(
                 "UPDATE ConnectedUsers SET status = ? WHERE connected_User_Id = ?"
             ).bind("died-0", targetUserId).all();
             let targetUserProfile = await getUserProfile(env, targetUserId);
             returnValue = [
-                { "type": "text", "text": `${targetUserProfile.displayName}さんを殺しました。` },
+                { "type": "text", "text": `${targetUserProfile.displayName}の殺害を試みました。\r\n(騎士がいる場合は殺害できていない可能性があります。)` },
             ];
         }
         else {
@@ -370,6 +370,45 @@ export async function killSomeoneByWerewolf(data, request, env) {
 }
 
 export async function saveSomeonebyKnight(data, request, env) {
+    let returnValue;
+    let queriedUserId = data.events[0].source.userId;
+
+    const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
+    ).bind(queriedUserId).all();
+    const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM Rooms WHERE room_Code = ?"
+    ).bind(queriedUserInfo[0].room_Code).all();
+
+    let prompt = data.events[0].message.text;
+    const targetUserId = prompt.match(/\/jinro divine (U[0-9a-f]{32})/)[1];
+    let status = currentRoomInfo[0].status;
+
+    if (status.includes("night")) {
+        const { results: targetUserInfo } = await env.D1_DATABASE.prepare(
+            "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
+        ).bind(targetUserId).all();
+        let targetUserStatus = targetUserInfo[0].status;
+        if (targetUserStatus == "alive" || targetUserStatus == "died-0") {
+            await env.D1_DATABASE.prepare(
+                "UPDATE ConnectedUsers SET status = ? WHERE connected_User_Id = ?"
+            ).bind("saved", targetUserId).all();
+            let targetUserProfile = await getUserProfile(env, targetUserId);
+            returnValue = [
+                { "type": "text", "text": `${targetUserProfile.displayName}さんを守りました。` },
+            ];
+        }
+        else {
+            let targetUserProfile = await getUserProfile(env, targetUserId);
+            returnValue = [
+                { "type": "text", "text": `${targetUserProfile.displayName}さんを守ることはできません。` },
+                { "type": "text", "text": `再度選択してください。` }
+            ];
+            returnValue.push(await selectSomeoneByWerewolf(data, request, env, status))
+        }
+    }
+    console.log("返信の内容", returnValue);
+    return returnValue;
 
 }
 
@@ -414,7 +453,7 @@ export async function divineSomeoneByDiviner(data, request, env) {
         else {
             let targetUserProfile = await getUserProfile(env, targetUserId);
             returnValue = [
-                { "type": "text", "text": `${targetUserProfile.displayName}さんを占うことはできません。` },
+                { "type": "text", "text": `${targetUserProfile.displayName}さんは生存していないため、占うことはできません。` },
                 { "type": "text", "text": `再度選択してください。` }
             ];
             returnValue.push(await selectSomeoneByDiviner(data, request, env, status))
@@ -425,7 +464,59 @@ export async function divineSomeoneByDiviner(data, request, env) {
 }
 
 export async function seeSomeoneBySpiritist(data, request, env) {
+    let returnValue;
+    let queriedUserId = data.events[0].source.userId;
 
+    const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
+    ).bind(queriedUserId).all();
+    const { results: currentRoomInfo } = await env.D1_DATABASE.prepare(
+        "SELECT * FROM Rooms WHERE room_Code = ?"
+    ).bind(queriedUserInfo[0].room_Code).all();
+
+    let prompt = data.events[0].message.text;
+    const targetUserId = prompt.match(/\/jinro see (U[0-9a-f]{32})/)[1];
+    console.log(targetUserId)
+    let status = currentRoomInfo[0].status;
+
+    if (status.includes("night")) {
+        const { results: userInRoom } = await env.D1_DATABASE.prepare(
+            "SELECT * FROM ConnectedUsers WHERE room_Code = ?"
+        ).bind(queriedUserInfo[0].room_Code).all();
+        //userInRoomのうち、roleが"werewolf"のユーザーを取得
+        const werewolves = userInRoom.filter(user => user.role === "werewolf");
+        let targetUserStatus = queriedUserInfo[0].status;
+        console.log(targetUserStatus);
+        if (targetUserStatus.includes("dead")) {
+            let targetUserProfile = await getUserProfile(env, targetUserId);
+            const roleName = queriedUserInfo[0].role;
+            console.log(targetUserProfile.displayName);
+            console.log(roleName);
+            returnValue = [
+                {
+                    "type": "text", "text": `現在、人狼は${werewolves.length}人です。`
+                },
+                {
+                    "type": "text", "text": `${targetUserProfile.displayName}さんの役職は以下の通りです。`
+                },
+                {
+                    "type": "image",
+                    "originalContentUrl": `https://jinro-resources.pages.dev/${roleName}.PNG`,
+                    "previewImageUrl": `https://jinro-resources.pages.dev/${roleName}.PNG`
+                }
+            ];
+        }
+        else {
+            let targetUserProfile = await getUserProfile(env, targetUserId);
+            returnValue = [
+                { "type": "text", "text": `${targetUserProfile.displayName}さんは死亡していないため、占うことはできません。` },
+                { "type": "text", "text": `再度選択してください。` }
+            ];
+            returnValue.push(await selectSomeoneByDiviner(data, request, env, status))
+        }
+    }
+    console.log("返信の内容", returnValue);
+    return returnValue;
 }
 
 async function getUserProfilesList(env, connectedUsers) {

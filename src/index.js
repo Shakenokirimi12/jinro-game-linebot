@@ -55,7 +55,7 @@ async function readRequestBody(request, env) {
         case "/jinro discuss start":
           resmessage = await startDiscuss(data, request, env, 600);
           break;
-        case "/jinro timeup":
+        case "/jinro discuss end":
           resmessage = await startElection(data, request, env);
           break;
         case "/jinro check result":

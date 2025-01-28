@@ -19,6 +19,9 @@ export async function showRole(data, request, env) {
         }
         else {
             const roleName = queriedUserInfo[0].role;
+            if (!roleName) {
+                return [{ "type": "text", "text": "あなたの役職はまだ決まっていません。" }];
+            }
             let returnMessageJson = [
                 {
                     "type": "text", "text": "あなたの役職は以下です。"
