@@ -1,6 +1,32 @@
-import { ruleFlexBuilder } from "../builders/ruleFlexBuilder.mjs";
+// @ts-nocheck
 
-export async function makeRulelist(data, request, env) {
+import { ruleFlexBuilder } from "../builders/ruleFlexBuilder";
+
+interface LineMessage {
+  type: string;
+  text: string;
+}
+
+interface LineEvent {
+  type: string;
+  message: LineMessage;
+  replyToken: string;
+  source: {
+    userId: string;
+    type: string;
+  };
+}
+
+interface WebhookData {
+  events: LineEvent[];
+}
+
+interface Env {
+  ACCESS_TOKEN: string;
+  D1_DATABASE: D1Database;
+}
+
+export async function makeRulelist(data: WebhookData, request: Request, env: Env): Promise<any[]> {
     let queriedUserId = data.events[0].source.userId;
     const { results: connectedRoom } = await env.D1_DATABASE.prepare(
         "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"

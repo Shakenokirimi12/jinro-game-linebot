@@ -1,4 +1,42 @@
-export async function startElection(data, env) {
+// @ts-nocheck
+
+interface LineMessage {
+  type: string;
+  text: string;
+}
+
+interface LineEvent {
+  type: string;
+  message: LineMessage;
+  replyToken: string;
+  source: {
+    userId: string;
+    type: string;
+  };
+}
+
+interface WebhookData {
+  events: LineEvent[];
+}
+
+interface Env {
+  ACCESS_TOKEN: string;
+  D1_DATABASE: D1Database;
+}
+
+interface ConnectedUser {
+  connected_User_Id: string;
+  room_Code: string;
+  status: string;
+  votes?: number;
+  role?: string;
+}
+
+interface UserProfile {
+  displayName: string;
+}
+
+export async function startElection(data: WebhookData, env: Env): Promise<any[]> {
     let queriedUserId = data.events[0].source.userId;
     let origintype = data.events[0].source.type;
     if (origintype == "group") {
@@ -27,12 +65,12 @@ export async function startElection(data, env) {
 
 }
 
-async function getUserProfilesList(env, connectedUsers) {
+async function getUserProfilesList(env: Env, connectedUsers: ConnectedUser[]): Promise<string> {
     let displayNames = [];
 
     for (const user of connectedUsers) {
         const userId = user.connected_User_Id;
-        const userProfile = await getUserProfile(env, userId);
+        const userProfile: UserProfile = await getUserProfile(env, userId);
         displayNames.push(userProfile.displayName);
     }
 
@@ -41,7 +79,7 @@ async function getUserProfilesList(env, connectedUsers) {
 }
 
 
-async function getUserProfile(env, userId) {
+async function getUserProfile(env: Env, userId: string): Promise<UserProfile> {
     let requestUrl = `https://api.line.me/v2/bot/profile/${userId}`;
     let returnData = await fetch(requestUrl, {
         method: "GET",
@@ -58,7 +96,7 @@ async function getUserProfile(env, userId) {
     return returnData;
 }
 
-export async function handleMention(data, request, env) {
+export async function handleMention(data: WebhookData, request: Request, env: Env): Promise<any> {
     try {
         let mentionees = data.events[0].message.mention.mentionees;
         let prompt = data.events[0].message.text;
@@ -171,12 +209,12 @@ export async function handleMention(data, request, env) {
 }
 
 
-function allUsersVoted(usersInfo) {
+function allUsersVoted(usersInfo: ConnectedUser[]): boolean {
     return usersInfo.every(user => user.status === 'voted');
 }
 
 
-export async function checkResult(data, request, env) {
+export async function checkResult(data: WebhookData, request: Request, env: Env): Promise<any> {
     let queriedUserId = data.events[0].source.userId;
     const { results: queriedUserInfo } = await env.D1_DATABASE.prepare(
         "SELECT * FROM ConnectedUsers WHERE connected_User_Id = ?"
@@ -499,7 +537,7 @@ export async function checkResult(data, request, env) {
     }
 }
 
-function getTopVotedUsers(usersInfo) {
+function getTopVotedUsers(usersInfo: ConnectedUser[]): string[] {
     if (usersInfo.length === 0) return [];
     console.log(usersInfo);
 
@@ -513,7 +551,7 @@ function getTopVotedUsers(usersInfo) {
     return topVotedUsers;
 }
 
-function isJinroWin(aliveWerewolvesCount, aliveNonWerewolvesCount) {
+function isJinroWin(aliveWerewolvesCount: number, aliveNonWerewolvesCount: number): boolean {
     if (aliveWerewolvesCount >= aliveNonWerewolvesCount) {
         return true;
     } else {

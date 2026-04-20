@@ -1,6 +1,32 @@
-import { doNightTurn } from "./nightTurn.mjs";
+// @ts-nocheck
 
-export async function showRole(data, request, env) {
+import { doNightTurn } from "./nightTurn";
+
+interface LineMessage {
+  type: string;
+  text: string;
+}
+
+interface LineEvent {
+  type: string;
+  message: LineMessage;
+  replyToken: string;
+  source: {
+    userId: string;
+    type: string;
+  };
+}
+
+interface WebhookData {
+  events: LineEvent[];
+}
+
+interface Env {
+  ACCESS_TOKEN: string;
+  D1_DATABASE: D1Database;
+}
+
+export async function showRole(data: WebhookData, request: Request, env: Env): Promise<any[]> {
     let origintype = data.events[0].source.type;
     let queriedUserId = data.events[0].source.userId;
     if (origintype == "group") {

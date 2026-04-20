@@ -1,5 +1,52 @@
 
-export async function disconRoom(data, request, env) {
+// @ts-nocheck
+
+interface LineMessage {
+  type: string;
+  text: string;
+}
+
+interface LineEvent {
+  type: string;
+  message: LineMessage;
+  replyToken: string;
+  source: {
+    userId: string;
+    type: string;
+  };
+}
+
+interface WebhookData {
+  events: LineEvent[];
+}
+
+interface Env {
+  ACCESS_TOKEN: string;
+  D1_DATABASE: D1Database;
+}
+
+interface UserProfile {
+  displayName: string;
+}
+
+async function getUserProfile(env: Env, userId: string): Promise<UserProfile> {
+    let requestUrl = `https://api.line.me/v2/bot/profile/${userId}`;
+    let returnData = await fetch(requestUrl, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            Authorization: `Bearer ${env.ACCESS_TOKEN}`,
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            return data;
+        });
+
+    return returnData;
+}
+
+export async function disconRoom(data: WebhookData, request: Request, env: Env): Promise<any[]> {
     let queriedUserId = data.events[0].source.userId;
     let prompt = data.events[0].message.text;
     let userData = await getUserProfile(env, queriedUserId);
@@ -30,22 +77,4 @@ export async function disconRoom(data, request, env) {
         return [{ "type": "text", "text": "どのルームにも接続されていません。" }];
     }
 
-}
-
-
-async function getUserProfile(env, userId) {
-    let requestUrl = `https://api.line.me/v2/bot/profile/${userId}`;
-    let returnData = await fetch(requestUrl, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-            Authorization: `Bearer ${env.ACCESS_TOKEN}`,
-        },
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            return data;
-        });
-
-    return returnData;
 }

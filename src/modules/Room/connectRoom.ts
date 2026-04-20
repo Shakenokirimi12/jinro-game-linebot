@@ -1,5 +1,52 @@
 
-export async function connectRoom(data, request, env, BOT_URL) {
+// @ts-nocheck
+
+interface LineMessage {
+  type: string;
+  text: string;
+}
+
+interface LineEvent {
+  type: string;
+  message: LineMessage;
+  replyToken: string;
+  source: {
+    userId: string;
+    type: string;
+  };
+}
+
+interface WebhookData {
+  events: LineEvent[];
+}
+
+interface Env {
+  ACCESS_TOKEN: string;
+  D1_DATABASE: D1Database;
+}
+
+interface UserProfile {
+  displayName: string;
+}
+
+async function getUserProfile(env: Env, userId: string): Promise<UserProfile> {
+    let requestUrl = `https://api.line.me/v2/bot/profile/${userId}`;
+    let returnData = await fetch(requestUrl, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json; charset=UTF-8",
+            Authorization: `Bearer ${env.ACCESS_TOKEN}`,
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            return data;
+        });
+
+    return returnData;
+}
+
+export async function connectRoom(data: WebhookData, request: Request, env: Env, BOT_URL: string): Promise<any[]> {
     console.log(JSON.stringify(data.events[0]));
     let origintype = data.events[0].source.type;
     let queriedUserId = data.events[0].source.userId;
@@ -237,24 +284,4 @@ export async function connectRoom(data, request, env, BOT_URL) {
             return [{ "type": "text", "text": `${userData.displayName}さんはすでにルームに参加しています。\r\n接続を解除するには、/jinro discon　と送信してください。\r\nルームを作った人は、connectは必要ありません。` }];
         }
     }
-}
-
-
-
-
-async function getUserProfile(env, userId) {
-    let requestUrl = `https://api.line.me/v2/bot/profile/${userId}`;
-    let returnData = await fetch(requestUrl, {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json; charset=UTF-8",
-            Authorization: `Bearer ${env.ACCESS_TOKEN}`,
-        },
-    })
-        .then((response) => response.json())
-        .then((data) => {
-            return data;
-        });
-
-    return returnData;
 }

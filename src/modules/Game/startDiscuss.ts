@@ -1,4 +1,28 @@
-export async function startDiscuss(data, request, env, time) {
+interface LineMessage {
+  type: string;
+  text: string;
+}
+
+interface LineEvent {
+  type: string;
+  message: LineMessage;
+  replyToken: string;
+  source: {
+    userId: string;
+    type: string;
+  };
+}
+
+interface WebhookData {
+  events: LineEvent[];
+}
+
+interface Env {
+  ACCESS_TOKEN: string;
+  D1_DATABASE: D1Database;
+}
+
+export async function startDiscuss(data: WebhookData, request: Request, env: Env, time: number): Promise<any[]> {
     const returnJson = [
         {
             "type": "flex",

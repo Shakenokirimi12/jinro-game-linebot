@@ -1,4 +1,4 @@
-export async function ruleFlexBuilder(ruleName, citizen, werewolf, diviner, spiritist, knight, madman, fox, ruleId) {
+export async function ruleFlexBuilder(ruleName: string, citizen: number, werewolf: number, diviner: number, spiritist: number, knight: number, madman: number, fox: number, ruleId: string): Promise<any> {
   let actiontext = `/jinro rule ${ruleId}`;
   let DefaultRule = {
     "type": "bubble",

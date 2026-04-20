@@ -1,4 +1,9 @@
-export async function userMenuBuilder(userIdList, modeName, env) {
+interface Env {
+  ACCESS_TOKEN: string;
+  D1_DATABASE: D1Database;
+}
+
+export async function userMenuBuilder(userIdList: string[], modeName: string, env: Env): Promise<void> {
     const { results: richMenus } = await env.D1_DATABASE.prepare(
         "SELECT * FROM Menus WHERE modeName = ?"
     ).bind(modeName).all();

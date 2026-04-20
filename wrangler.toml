@@ -1,6 +1,6 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "line-de-jinro"
-main = "src/index.js"
+main = "src/index.ts"
 compatibility_date = "2024-04-23"
 compatibility_flags = ["nodejs_compat"]
 workers_dev = false

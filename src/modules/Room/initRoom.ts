@@ -1,5 +1,31 @@
 
-export async function initRoom(data, request, env, BOT_URL) {
+// @ts-nocheck
+
+interface LineMessage {
+  type: string;
+  text: string;
+}
+
+interface LineEvent {
+  type: string;
+  message: LineMessage;
+  replyToken: string;
+  source: {
+    userId: string;
+    type: string;
+  };
+}
+
+interface WebhookData {
+  events: LineEvent[];
+}
+
+interface Env {
+  ACCESS_TOKEN: string;
+  D1_DATABASE: D1Database;
+}
+
+export async function initRoom(data: WebhookData, request: Request, env: Env, BOT_URL: string): Promise<any[]> {
     let origintype = data.events[0].source.type;
     //ルームコード生成
     let S = "0123456789"
